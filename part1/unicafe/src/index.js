@@ -8,12 +8,17 @@ const Button = ({ handleClick, text }) => {
 }
 
 const Result = ({ good, neutral, bad }) => {
-  console.log(good)
+  const all = (good) + (neutral * -1)
+  const average = ((good) + (neutral * -1)) / all
+  const positive = good / all
   return (
     <div>
       <p>good {good}</p>
       <p>neutral {neutral}</p>
       <p>bad {bad}</p>
+      {isFinite(all) ? <p>all {all}</p> : <></>}
+      {isFinite(average) ? <p>average {average}</p> : <></>}
+      {isFinite(positive) ? <p>positive {positive}</p> : <></>}
     </div>
   )
 }
