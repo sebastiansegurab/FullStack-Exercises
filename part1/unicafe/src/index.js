@@ -16,9 +16,15 @@ const Statistics = ({ good, neutral, bad }) => {
       <p>good {good}</p>
       <p>neutral {neutral}</p>
       <p>bad {bad}</p>
-      {isFinite(all) ? <p>all {all}</p> : <></>}
-      {isFinite(average) ? <p>average {average}</p> : <></>}
-      {isFinite(positive) ? <p>positive {positive}</p> : <></>}
+      {good !== 0 || neutral !== 0 || bad !== 0 ?
+        <>
+          {isFinite(all) ? <p>all {all}</p> : <></>}
+          {isFinite(average) ? <p>average {average}</p> : <></>}
+          {isFinite(positive) ? <p>positive {positive}</p> : <></>}
+        </>
+        :
+        <p>No feedback given</p>
+      }
     </div>
   )
 }
