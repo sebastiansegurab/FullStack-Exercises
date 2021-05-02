@@ -9,7 +9,7 @@ const Button = ({ handleClick, text }) => {
 
 const Statistics = ({ text, value }) => {
   if (isFinite(value)) {
-    return (<p>{text} {value}</p>)
+    return (<tr key={text}><th>{text}</th><td>{value}</td></tr>)
   } else {
     return (<></>)
   }
@@ -29,14 +29,16 @@ const App = () => {
       <Button handleClick={() => { setBad(bad + 1) }} text="bad" />
       <h1>statistics</h1>
       {good !== 0 || neutral !== 0 || bad !== 0 ?
-        <div>
-          <Statistics text="good" value={good} />
-          <Statistics text="neutral" value={neutral} />
-          <Statistics text="bad" value={bad} />
-          <Statistics text="all" value={((good) + (bad * -1)) / (good + neutral)} />
-          <Statistics text="average" value={((good) + (bad * -1)) / (good + neutral)} />
-          <Statistics text="positive" value={((good) + (bad * -1)) / (good + neutral)} />
-        </div>
+        <table style={{ textAlign: "left" }}>
+          <tbody>
+            <Statistics text="good" value={good} />
+            <Statistics text="neutral" value={neutral} />
+            <Statistics text="bad" value={bad} />
+            <Statistics text="all" value={((good) + (bad * -1))} />
+            <Statistics text="average" value={((good) + (bad * -1)) / (good + neutral)} />
+            <Statistics text="positive" value={(good) / (good + neutral)} />
+          </tbody>
+        </table>
         :
         <p>No feedback given</p>
       }
