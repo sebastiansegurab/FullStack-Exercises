@@ -11,10 +11,15 @@ const Part = ({ part }) => {
 }
 
 const Course = ({ course }) => {
+  let totalExercises = 0
+  for (const part of course.parts) {
+    totalExercises += part.exercises
+  }
   return (
     <div>
       <Header course={course} />
       {course.parts.map(part => <Part key={part.id} part={part} />)}
+      <strong>total of {totalExercises} exercises</strong>
     </div>
   )
 }
@@ -38,6 +43,11 @@ const App = () => {
         name: 'State of a component',
         exercises: 14,
         id: 3
+      },
+      {
+        name: 'Redux',
+        exercises: 11,
+        id: 4
       }
     ]
   }
