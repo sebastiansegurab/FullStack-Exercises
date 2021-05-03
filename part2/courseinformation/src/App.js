@@ -10,16 +10,21 @@ const Part = ({ part }) => {
   )
 }
 
+const Total = ({ parts }) => {
+  const total = parts.map(part => part.exercises).reduce((prevValue, currentValue) => {
+    return prevValue + currentValue
+  }, 0)
+  return (
+    <strong>total of {total} exercises</strong>
+  )
+}
+
 const Course = ({ course }) => {
-  let totalExercises = 0
-  for (const part of course.parts) {
-    totalExercises += part.exercises
-  }
   return (
     <div>
       <Header course={course} />
       {course.parts.map(part => <Part key={part.id} part={part} />)}
-      <strong>total of {totalExercises} exercises</strong>
+      <Total parts={course.parts} />
     </div>
   )
 }
