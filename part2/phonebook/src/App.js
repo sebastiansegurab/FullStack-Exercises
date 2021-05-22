@@ -1,5 +1,35 @@
 import React, { useState } from 'react'
 
+const Filter = ({ handleFindName, filterPersons }) => {
+  return (
+    <>filter shown with <input onChange={handleFindName} value={filterPersons} /></>
+  )
+}
+
+const PersonForm = ({ addName, handleChangeName, newName, handleChangeNumber, number }) => {
+  return (
+    <>
+      <form onSubmit={addName}>
+        <div>
+          name: <input onChange={handleChangeName} value={newName} required />
+        </div>
+        <div>
+          number: <input onChange={handleChangeNumber} value={number} required />
+        </div>
+        <div>
+          <button type="submit">add</button>
+        </div>
+      </form>
+    </>
+  )
+}
+
+const Persons = ({ listPersons }) => {
+  return (
+    <>{listPersons()}</>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456' },
@@ -43,26 +73,17 @@ const App = () => {
     persons
     :
     persons.filter(person => person.name.toLowerCase().includes(filterPersons.toLowerCase()))
-  const listNames = () => personsToShow.map(person => <p key={person.name}>{person.name} {person.number}</p>)
+  const listPersons = () => personsToShow.map(person => <p key={person.name}>{person.name} {person.number}</p>)
 
   return (
     <div>
       <h2>Phonebook</h2>
-      filter shown with <input onChange={handleFindName} value={filterPersons} />
+      <Filter filterPersons={filterPersons} handleFindName={handleFindName} />
       <h2>add a new</h2>
-      <form onSubmit={addName}>
-        <div>
-          name: <input onChange={handleChangeName} value={newName} required />
-        </div>
-        <div>
-          number: <input onChange={handleChangeNumber} value={number} required />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm addName={addName} handleChangeName={handleChangeName} newName={newName}
+        handleChangeNumber={handleChangeNumber} number={number} />
       <h2>Numbers</h2>
-      <>{listNames()}</>
+      <Persons listPersons={listPersons} />
     </div>
   )
 }
