@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 
 const Filter = ({ handleFindName, filterPersons }) => {
   return (
@@ -24,9 +25,12 @@ const PersonForm = ({ addName, handleChangeName, newName, handleChangeNumber, nu
   )
 }
 
-const Persons = ({ listPersons }) => {
+const Persons = ({ persons }) => {
+  console.log(persons)
   return (
-    <>{listPersons()}</>
+    <>{persons.map((person) => {
+      return <p key={person.name}>{person.name} {person.number}</p>
+    })}</>
   )
 }
 
@@ -40,6 +44,14 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [number, setNumber] = useState('')
   const [filterPersons, setFilterPersons] = useState('')
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+  }, [])
 
   const addName = (event) => {
     event.preventDefault()
@@ -83,7 +95,7 @@ const App = () => {
       <PersonForm addName={addName} handleChangeName={handleChangeName} newName={newName}
         handleChangeNumber={handleChangeNumber} number={number} />
       <h2>Numbers</h2>
-      <Persons listPersons={listPersons} />
+      <Persons persons={persons} />
     </div>
   )
 }
