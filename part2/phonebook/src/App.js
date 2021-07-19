@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 
-const Filter = ({ handleFindName, filterPersons }) => {
+import { createPerson, getAllPersons, deletePerson, updatePerson } from './services/persons'
+
+const Filter = ({ handleFindName, personsToFind }) => {
   return (
-    <>filter shown with <input onChange={handleFindName} value={filterPersons} /></>
+    <>filter shown with <input onChange={handleFindName} value={personsToFind} /></>
   )
 }
 
@@ -25,43 +26,75 @@ const PersonForm = ({ addName, handleChangeName, newName, handleChangeNumber, nu
   )
 }
 
-const Persons = ({ persons }) => {
-  return (
-    <>{persons.map((person) => {
-      return <p key={person.name}>{person.name} {person.number}</p>
-    })}</>
-  )
+const Persons = ({ persons, filterPersons, personsToFind }) => {
+  const handleDelete = (e, personToEliminated) => {
+    if (window.confirm('Delete ' + personToEliminated.name + '?')) {
+      deletePerson(personToEliminated)
+        .then(status => {
+          if (status === 200) {
+            alert(personToEliminated.name + ' eliminated')
+            e.target.parentNode.parentNode.removeChild(e.target.parentNode);
+          } else {
+            alert(personToEliminated.name + " couldn't be deleted")
+          }
+        })
+    }
+  }
+
+  if (filterPersons.length > 0 && personsToFind !== '') {
+    return (
+      <>{filterPersons.map((person) => {
+        return (<div key={person.name}><p>{person.name} {person.number} <button onClick={(e) => handleDelete(e, person)}>delete</button></p></div>)
+      })}</>
+    )
+  } else {
+    return (
+      <>{persons.map((person) => {
+        return (<div key={person.name}><p>{person.name} {person.number} <button onClick={(e) => handleDelete(e, person)}>delete</button></p></div>)
+      })}</>
+    )
+  }
 }
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ])
   const [newName, setNewName] = useState('')
   const [number, setNumber] = useState('')
-  const [filterPersons, setFilterPersons] = useState('')
+  const [filterPersons, setFilterPersons] = useState([])
+  const [persons, setPersons] = useState([])
+  const [personsToFind, setPersonsToFind] = ('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    getAllPersons()
+      .then(persons => {
+        setPersons(persons)
       })
-  }, [])
+  }, [addName])
 
   const addName = (event) => {
     event.preventDefault()
     if (newName !== undefined || number !== undefined || newName.trim() !== '' || number.trim() !== '') {
       const personExists = persons.find(person => person.name === newName)
       if (personExists === undefined) {
-        setPersons(persons.concat({ name: newName, number }))
+        const personToAdd = {
+          name: newName,
+          number
+        }
+        createPerson(personToAdd)
+          .then(personAdd => {
+            alert(`${personAdd.name} was successfully added.`)
+            setPersons(prevPersons => prevPersons.concat(personAdd))
+          })
+          .catch(error => {
+            alert(error)
+          })
         setNewName('')
         setNumber('')
       } else {
-        alert(`${newName} is already added to phonebook`)
+        if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+          updatePerson(personExists, { name: newName, number }).then(personUpdated => {
+            alert(`${personUpdated.name}'s number was successfully updated.`)
+          })
+        }
       }
     } else {
       alert('Both data are required')
@@ -77,24 +110,22 @@ const App = () => {
   }
 
   const handleFindName = (event) => {
-    setFilterPersons(event.target.value)
+    if (event.target.value !== '') {
+      setFilterPersons(persons.filter(person => person.name.toLowerCase().includes(event.target.value)))
+    } else {
+      setFilterPersons(persons)
+    }
   }
-
-  const personsToShow = filterPersons === '' && filterPersons === undefined ?
-    persons
-    :
-    persons.filter(person => person.name.toLowerCase().includes(filterPersons.toLowerCase()))
-  const listPersons = () => personsToShow.map(person => <p key={person.name}>{person.name} {person.number}</p>)
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Filter filterPersons={filterPersons} handleFindName={handleFindName} />
+      <Filter personsToFind={personsToFind} handleFindName={handleFindName} />
       <h2>add a new</h2>
       <PersonForm addName={addName} handleChangeName={handleChangeName} newName={newName}
         handleChangeNumber={handleChangeNumber} number={number} />
       <h2>Numbers</h2>
-      <Persons persons={persons} />
+      <Persons persons={persons} filterPersons={filterPersons} personsToFind={personsToFind} />
     </div>
   )
 }
