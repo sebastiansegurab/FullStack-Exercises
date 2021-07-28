@@ -28,19 +28,22 @@ const PersonForm = ({ addName, handleChangeName, newName, handleChangeNumber, nu
   )
 }
 
-const Persons = ({ persons, personsToFind, updatePersons }) => {
+const Persons = ({ persons, personsToFind, updatePersons, notificationStateFromChild }) => {
   const handleDelete = (e, personToEliminated) => {
     if (window.confirm('Delete ' + personToEliminated.name + '?')) {
       deletePerson(personToEliminated)
         .then(status => {
-          if (status === 200) {
-            alert(personToEliminated.name + ' eliminated.')
-            e.target.parentNode.parentNode.removeChild(e.target.parentNode);
-            let arrayPersons = persons.filter(person => person.id !== personToEliminated.id)
-            updatePersons(arrayPersons)
-          } else {
-            alert(personToEliminated.name + " couldn't be deleted.")
-          }
+          notificationStateFromChild({ status, message: personToEliminated.name + ' eliminated.' })
+          e.target.parentNode.parentNode.removeChild(e.target.parentNode);
+          let arrayPersons = persons.filter(person => person.id !== personToEliminated.id)
+          updatePersons(arrayPersons)
+        }).catch(error => {
+          notificationStateFromChild({ status: error.status, message: `Information of ${personToEliminated.name} has already been removed from server.` })
+          setTimeout(() => {
+            notificationStateFromChild(null)
+          }, 5000)
+          let arrayPersons = persons.filter(person => person.id !== personToEliminated.id)
+          updatePersons(arrayPersons)
         })
     }
   }
@@ -64,10 +67,23 @@ const Persons = ({ persons, personsToFind, updatePersons }) => {
 }
 
 const Notification = ({ notification }) => {
+  const stylesNoti = {
+    marginBottom: '1rem',
+    borderRadius: '0.5rem',
+    backgroundColor: '#bfbfbf',
+    padding: '1rem'
+  }
   if (notification === null) {
     return null;
   } else {
-    return <div className='noti'>{notification}</div>
+    if (notification.status === 200) {
+      stylesNoti.color = 'green'
+      stylesNoti.border = '.3rem solid green'
+    } else {
+      stylesNoti.color = 'red'
+      stylesNoti.border = '.3rem solid red'
+    }
+    return <div style={stylesNoti}>{notification.message}</div>
   }
 }
 
@@ -96,7 +112,7 @@ const App = () => {
         }
         createPerson(personToAdd)
           .then(personAdd => {
-            setNotification(`Added ${personAdd.name}.`)
+            setNotification({ status: 200, operation: 'CREATE', message: `Added ${personAdd.name}.` })
             setTimeout(() => {
               setNotification(null)
             }, 5000)
@@ -105,14 +121,14 @@ const App = () => {
             })
           })
           .catch(error => {
-            alert(error)
+            setNotification({ status: error.status, operation: 'CREATE', message: error.message })
           })
         setNewName('')
         setNumber('')
       } else {
         if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
           updatePerson(personExists, { name: newName, number }).then(personUpdated => {
-            setNotification(`${personUpdated.name}'s number was successfully updated.`)
+            setNotification({ status: 200, message: `${personUpdated.name}'s number was successfully updated.` })
             setTimeout(() => {
               setNotification(null)
             }, 5000)
@@ -122,17 +138,19 @@ const App = () => {
             setNewName('')
             setNumber('')
           }).catch(error => {
-            alert(error)
+            setNotification({ status: error.status, message: `Information of ${personExists.name} has already been removed from server.` })
+            setTimeout(() => {
+              setNotification(null)
+            }, 5000)
+            getAllPersons().then(response => {
+              setPersons(response)
+            })
           })
         }
       }
     } else {
       alert('Both data are required')
     }
-  }
-
-  const updatePersons = personsArray => {
-    setPersons(personsArray)
   }
 
   const handleChangeName = (event) => {
@@ -147,6 +165,14 @@ const App = () => {
     setPersonsToFind(event.target.value)
   }
 
+  const updatePersons = personsArray => {
+    setPersons(personsArray)
+  }
+
+  const notificationStateFromChild = notificationState => {
+    setNotification(notificationState)
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -156,7 +182,7 @@ const App = () => {
       <PersonForm addName={addName} handleChangeName={handleChangeName} newName={newName}
         handleChangeNumber={handleChangeNumber} number={number} />
       <h2>Numbers</h2>
-      <Persons persons={persons} personsToFind={personsToFind} updatePersons={updatePersons} />
+      <Persons persons={persons} personsToFind={personsToFind} updatePersons={updatePersons} notificationStateFromChild={notificationStateFromChild} />
     </div>
   )
 }
