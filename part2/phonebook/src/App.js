@@ -26,7 +26,7 @@ const PersonForm = ({ addName, handleChangeName, newName, handleChangeNumber, nu
   )
 }
 
-const Persons = ({ persons, filterPersons, personsToFind }) => {
+const Persons = ({ persons, personsToFind }) => {
   const handleDelete = (e, personToEliminated) => {
     if (window.confirm('Delete ' + personToEliminated.name + '?')) {
       deletePerson(personToEliminated)
@@ -41,11 +41,14 @@ const Persons = ({ persons, filterPersons, personsToFind }) => {
     }
   }
 
-  if (filterPersons.length > 0 && personsToFind !== '') {
+  if (personsToFind !== '' && personsToFind !== undefined) {
     return (
-      <>{filterPersons.map((person) => {
-        return (<div key={person.name}><p>{person.name} {person.number} <button onClick={(e) => handleDelete(e, person)}>delete</button></p></div>)
-      })}</>
+      <>{persons.map(function(person) {
+        if(person.name.includes(personsToFind)){
+          return (<div key={person.name}><p>{person.name} {person.number} <button onClick={(e) => handleDelete(e, person)}>delete</button></p></div>)
+        }
+      }
+      )}</>
     )
   } else {
     return (
@@ -59,16 +62,15 @@ const Persons = ({ persons, filterPersons, personsToFind }) => {
 const App = () => {
   const [newName, setNewName] = useState('')
   const [number, setNumber] = useState('')
-  const [filterPersons, setFilterPersons] = useState([])
   const [persons, setPersons] = useState([])
-  const [personsToFind, setPersonsToFind] = ('')
+  const [personsToFind, setPersonsToFind] = useState('')
 
   useEffect(() => {
     getAllPersons()
       .then(persons => {
         setPersons(persons)
       })
-  }, [addName])
+  }, [])
 
   const addName = (event) => {
     event.preventDefault()
@@ -93,6 +95,9 @@ const App = () => {
         if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
           updatePerson(personExists, { name: newName, number }).then(personUpdated => {
             alert(`${personUpdated.name}'s number was successfully updated.`)
+            getAllPersons().then(response => {
+              setPersons(response)
+            })
           })
         }
       }
@@ -110,11 +115,7 @@ const App = () => {
   }
 
   const handleFindName = (event) => {
-    if (event.target.value !== '') {
-      setFilterPersons(persons.filter(person => person.name.toLowerCase().includes(event.target.value)))
-    } else {
-      setFilterPersons(persons)
-    }
+    setPersonsToFind(event.target.value)
   }
 
   return (
@@ -125,7 +126,7 @@ const App = () => {
       <PersonForm addName={addName} handleChangeName={handleChangeName} newName={newName}
         handleChangeNumber={handleChangeNumber} number={number} />
       <h2>Numbers</h2>
-      <Persons persons={persons} filterPersons={filterPersons} personsToFind={personsToFind} />
+      <Persons persons={persons} personsToFind={personsToFind} />
     </div>
   )
 }

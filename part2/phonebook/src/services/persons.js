@@ -23,11 +23,8 @@ export const deletePerson = (person) => {
     })
 }
 
-export const updatePerson = (person, number) => {
-    console.log(person)
-    console.log(number)
-    return axios.put(url + '/' + person.id, { number }).then(response => {
-        console.log(response)
+export const updatePerson = (person, personUpdate) => {
+    return axios.put(url + '/' + person.id, personUpdate).then(response => {
         const { data } = response
         return data
     })
