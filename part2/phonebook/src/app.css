@@ -1,0 +1,8 @@
+.noti {
+  margin-bottom: 1rem;
+  border: .3rem solid green;
+  border-radius: 0.5rem;
+  background-color: #bfbfbf;
+  color: green;
+  padding: 1rem;
+}

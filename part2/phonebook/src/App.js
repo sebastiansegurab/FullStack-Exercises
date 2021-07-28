@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 
 import { createPerson, getAllPersons, deletePerson, updatePerson } from './services/persons'
 
+import './app.css'
+
 const Filter = ({ handleFindName, personsToFind }) => {
   return (
     <>filter shown with <input onChange={handleFindName} value={personsToFind} /></>
@@ -26,16 +28,18 @@ const PersonForm = ({ addName, handleChangeName, newName, handleChangeNumber, nu
   )
 }
 
-const Persons = ({ persons, personsToFind }) => {
+const Persons = ({ persons, personsToFind, updatePersons }) => {
   const handleDelete = (e, personToEliminated) => {
     if (window.confirm('Delete ' + personToEliminated.name + '?')) {
       deletePerson(personToEliminated)
         .then(status => {
           if (status === 200) {
-            alert(personToEliminated.name + ' eliminated')
+            alert(personToEliminated.name + ' eliminated.')
             e.target.parentNode.parentNode.removeChild(e.target.parentNode);
+            let arrayPersons = persons.filter(person => person.id !== personToEliminated.id)
+            updatePersons(arrayPersons)
           } else {
-            alert(personToEliminated.name + " couldn't be deleted")
+            alert(personToEliminated.name + " couldn't be deleted.")
           }
         })
     }
@@ -43,8 +47,8 @@ const Persons = ({ persons, personsToFind }) => {
 
   if (personsToFind !== '' && personsToFind !== undefined) {
     return (
-      <>{persons.map(function(person) {
-        if(person.name.includes(personsToFind)){
+      <>{persons.map(function (person) {
+        if (person.name.includes(personsToFind)) {
           return (<div key={person.name}><p>{person.name} {person.number} <button onClick={(e) => handleDelete(e, person)}>delete</button></p></div>)
         }
       }
@@ -59,11 +63,20 @@ const Persons = ({ persons, personsToFind }) => {
   }
 }
 
+const Notification = ({ notification }) => {
+  if (notification === null) {
+    return null;
+  } else {
+    return <div className='noti'>{notification}</div>
+  }
+}
+
 const App = () => {
   const [newName, setNewName] = useState('')
   const [number, setNumber] = useState('')
   const [persons, setPersons] = useState([])
   const [personsToFind, setPersonsToFind] = useState('')
+  const [notification, setNotification] = useState(null)
 
   useEffect(() => {
     getAllPersons()
@@ -83,8 +96,13 @@ const App = () => {
         }
         createPerson(personToAdd)
           .then(personAdd => {
-            alert(`${personAdd.name} was successfully added.`)
-            setPersons(prevPersons => prevPersons.concat(personAdd))
+            setNotification(`Added ${personAdd.name}.`)
+            setTimeout(() => {
+              setNotification(null)
+            }, 5000)
+            getAllPersons().then(response => {
+              setPersons(response)
+            })
           })
           .catch(error => {
             alert(error)
@@ -94,16 +112,27 @@ const App = () => {
       } else {
         if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
           updatePerson(personExists, { name: newName, number }).then(personUpdated => {
-            alert(`${personUpdated.name}'s number was successfully updated.`)
+            setNotification(`${personUpdated.name}'s number was successfully updated.`)
+            setTimeout(() => {
+              setNotification(null)
+            }, 5000)
             getAllPersons().then(response => {
               setPersons(response)
             })
+            setNewName('')
+            setNumber('')
+          }).catch(error => {
+            alert(error)
           })
         }
       }
     } else {
       alert('Both data are required')
     }
+  }
+
+  const updatePersons = personsArray => {
+    setPersons(personsArray)
   }
 
   const handleChangeName = (event) => {
@@ -121,12 +150,13 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification notification={notification} />
       <Filter personsToFind={personsToFind} handleFindName={handleFindName} />
       <h2>add a new</h2>
       <PersonForm addName={addName} handleChangeName={handleChangeName} newName={newName}
         handleChangeNumber={handleChangeNumber} number={number} />
       <h2>Numbers</h2>
-      <Persons persons={persons} personsToFind={personsToFind} />
+      <Persons persons={persons} personsToFind={personsToFind} updatePersons={updatePersons} />
     </div>
   )
 }
