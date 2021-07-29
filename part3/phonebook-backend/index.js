@@ -13,7 +13,7 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
-const cors = require('cors');
+const cors = require("cors");
 app.use(cors());
 
 let persons = [
@@ -22,6 +22,10 @@ let persons = [
   { id: 3, name: "Dan Abramov", number: "12-43-234345" },
   { id: 4, name: "Mary Poppendick", number: "39-23-6423122" },
 ];
+
+app.get("/", (request, response) => {
+  response.send("<h1>Hello World</h1>");
+});
 
 app.get("/api/persons", (request, response) => {
   response.json(persons);
@@ -47,9 +51,11 @@ app.delete("/api/persons/:id", (request, response) => {
   const id = Number.parseInt(request.params.id);
   const person = persons.find((person) => person.id === id);
   if (person) {
-    let index = persons.map(person => {
-      return person.id;
-    }).indexOf(id);
+    let index = persons
+      .map((person) => {
+        return person.id;
+      })
+      .indexOf(id);
     persons.splice(index, 1);
     response.status(200).end();
   } else {
@@ -78,13 +84,14 @@ app.post("/api/persons", (request, response) => {
         .send({ error: `${body.name} already exists in the phonebook.` });
     } else {
       body.id = Math.floor((Math.random() * (10000 - 1) + 1) * 10000);
-      persons.push(body)
+      persons.push(body);
       return response.json(body);
     }
   }
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
