@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
 app.use(express.json());
+app.use(morgan("tiny"));
 
 let persons = [
   { id: 1, name: "Arto Hellas", number: "040-123456" },
@@ -57,7 +59,7 @@ app.post("/api/persons", (request, response) => {
     if (personExists) {
       response
         .status(409)
-        .send(`${body.name} already exists in the phonebook.`);
+        .send({ error: `${body.name} already exists in the phonebook.` });
     } else {
       body.id = Math.floor((Math.random() * (10000 - 1) + 1) * 10000);
       response.json(body);
