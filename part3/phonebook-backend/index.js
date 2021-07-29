@@ -51,8 +51,17 @@ app.post("/api/persons", (request, response) => {
   ) {
     response.status(400).end();
   } else {
-    body.id = Math.floor((Math.random() * (10000 - 1) + 1) * 10000);
-    response.json(body);
+    const personExists = persons.find(
+      (person) => person.name.toLowerCase() === body.name.toLowerCase()
+    );
+    if (personExists) {
+      response
+        .status(409)
+        .send(`${body.name} already exists in the phonebook.`);
+    } else {
+      body.id = Math.floor((Math.random() * (10000 - 1) + 1) * 10000);
+      response.json(body);
+    }
   }
 });
 
