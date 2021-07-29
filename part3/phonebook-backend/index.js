@@ -1,9 +1,9 @@
 const { request } = require("express");
 const express = require("express");
 const app = express();
-const morgan = require("morgan");
 app.use(express.json());
 
+const morgan = require("morgan");
 morgan.token("body", function getBody(request) {
   if (request.method === "POST") {
     return JSON.stringify(request.body);
@@ -12,6 +12,9 @@ morgan.token("body", function getBody(request) {
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
+
+const cors = require('cors');
+app.use(cors());
 
 let persons = [
   { id: 1, name: "Arto Hellas", number: "040-123456" },
@@ -44,6 +47,10 @@ app.delete("/api/persons/:id", (request, response) => {
   const id = Number.parseInt(request.params.id);
   const person = persons.find((person) => person.id === id);
   if (person) {
+    let index = persons.map(person => {
+      return person.id;
+    }).indexOf(id);
+    persons.splice(index, 1);
     response.status(200).end();
   } else {
     response.status(404).end();
@@ -71,7 +78,8 @@ app.post("/api/persons", (request, response) => {
         .send({ error: `${body.name} already exists in the phonebook.` });
     } else {
       body.id = Math.floor((Math.random() * (10000 - 1) + 1) * 10000);
-      response.json(body);
+      persons.push(body)
+      return response.json(body);
     }
   }
 });

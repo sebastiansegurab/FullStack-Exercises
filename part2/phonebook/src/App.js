@@ -35,6 +35,9 @@ const Persons = ({ persons, personsToFind, updatePersons, notificationStateFromC
         .then(status => {
           notificationStateFromChild({ status, message: personToEliminated.name + ' eliminated.' })
           e.target.parentNode.parentNode.removeChild(e.target.parentNode);
+          setTimeout(() => {
+            notificationStateFromChild(null)
+          }, 5000)
           let arrayPersons = persons.filter(person => person.id !== personToEliminated.id)
           updatePersons(arrayPersons)
         }).catch(error => {
