@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+app.use(express.json());
 
 let persons = [
   { id: 1, name: "Arto Hellas", number: "040-123456" },
@@ -35,6 +36,23 @@ app.delete("/api/persons/:id", (request, response) => {
     response.status(200).end();
   } else {
     response.status(404).end();
+  }
+});
+
+app.post("/api/persons", (request, response) => {
+  const { body } = request;
+  if (
+    body.name === undefined ||
+    body.name === null ||
+    body.name === "" ||
+    body.number === undefined ||
+    body.number === null ||
+    body.number === ""
+  ) {
+    response.status(400).end();
+  } else {
+    body.id = Math.floor((Math.random() * (10000 - 1) + 1) * 10000);
+    response.json(body);
   }
 });
 
