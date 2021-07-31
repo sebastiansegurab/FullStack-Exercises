@@ -54,7 +54,7 @@ const Persons = ({ persons, personsToFind, updatePersons, notificationStateFromC
   if (personsToFind !== '' && personsToFind !== undefined) {
     return (
       <>{persons.map(function (person) {
-        if (person.name.includes(personsToFind)) {
+        if (person.name.toLowerCase().includes(personsToFind.toLowerCase())) {
           return (<div key={person.name}><p>{person.name} {person.number} <button onClick={(e) => handleDelete(e, person)}>delete</button></p></div>)
         }
       }

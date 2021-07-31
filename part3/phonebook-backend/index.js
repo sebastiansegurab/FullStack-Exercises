@@ -1,65 +1,93 @@
-const { request } = require("express");
 const express = require("express");
 const app = express();
 app.use(express.json());
-
-const morgan = require("morgan");
-morgan.token("body", function getBody(request) {
-  if (request.method === "POST") {
-    return JSON.stringify(request.body);
-  }
-});
-app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms :body")
-);
-
+app.use(express.static("build"));
 const cors = require("cors");
 app.use(cors());
 
-let persons = [
-  { id: 1, name: "Arto Hellas", number: "040-123456" },
-  { id: 2, name: "Ada Lovelace", number: "39-44-5323523" },
-  { id: 3, name: "Dan Abramov", number: "12-43-234345" },
-  { id: 4, name: "Mary Poppendick", number: "39-23-6423122" },
-];
+require("dotenv").config();
+const mongoose = require("mongoose");
+
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true,
+}).then(result => {
+  console.log("Connected to MongoDB")
+}).catch(error => {
+  console.log("Error connecting to MongoDB: ", error.message)
+});
+
+const personSchema = mongoose.Schema({
+  name: String,
+  number: String
+}, {
+  bufferCommands: false
+});
+
+personSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+
+const Person = mongoose.model("Person", personSchema);
+
+app.get("/", (request, response) => {
+  response.send("<h1>Hello World</h1>");
+});
 
 app.get("/", (request, response) => {
   response.send("<h1>Hello World</h1>");
 });
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  Person.find({}).then(persons => {
+    response.json(persons);
+  })
 });
 
-app.get("/api/info", (request, response) => {
-  response.send(
-    `<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`
-  );
+app.get("/api/persons/info", (request, response) => {
+  Person.count({}, function (err, count) {
+    response.status(200).json({ message: `Phonebook has info for ${count} people ${new Date()}` })
+  })
+
 });
 
 app.get("/api/persons/:id", (request, response) => {
-  const id = Number.parseInt(request.params.id);
-  const person = persons.find((person) => person.id === id);
-  if (person) {
-    response.json(person);
+  const id = request.params.id
+  if (id.length < 24) {
+    response.status(400).json({ error: "Bad request." })
   } else {
-    response.status(404).end();
+    Person.findById(id).then(person => {
+      if (person) {
+        response.json(person)
+      } else {
+        return response.status(404).json({ error: "Person doesn't exists" })
+      }
+    }).catch(error => {
+      console.log("Error finding person: ", error.message)
+    })
   }
 });
 
 app.delete("/api/persons/:id", (request, response) => {
-  const id = Number.parseInt(request.params.id);
-  const person = persons.find((person) => person.id === id);
-  if (person) {
-    let index = persons
-      .map((person) => {
-        return person.id;
-      })
-      .indexOf(id);
-    persons.splice(index, 1);
-    response.status(200).end();
+  const id = request.params.id
+  if (id.length < 24) {
+    response.status(400).json({ error: "Bad request." })
   } else {
-    response.status(404).end();
+    Person.findByIdAndRemove(id).then(result => {
+      if (result) {
+        response.status(200).json({ message: "Person removed" })
+      } else {
+        return response.status(404).json({ error: "Person doesn't exists" })
+      }
+    }).catch(error => {
+      console.log("Error: ", error.message)
+    })
   }
 });
 
@@ -73,20 +101,23 @@ app.post("/api/persons", (request, response) => {
     body.number === null ||
     body.number === ""
   ) {
-    response.status(400).end();
+    response.status(400).json({ error: "Content missing." }).end();
   } else {
-    const personExists = persons.find(
-      (person) => person.name.toLowerCase() === body.name.toLowerCase()
-    );
-    if (personExists) {
-      response
-        .status(409)
-        .send({ error: `${body.name} already exists in the phonebook.` });
-    } else {
-      body.id = Math.floor((Math.random() * (10000 - 1) + 1) * 10000);
-      persons.push(body);
-      return response.json(body);
-    }
+    Person.find({ name: body.name }).then(person => {
+      if (person.length > 0) {
+        response.status(409).json({ error: "Person already exists." })
+      } else {
+        const person = new Person({
+          name: body.name,
+          number: body.number
+        })
+        person.save().then(person => {
+          response.json(person)
+        })
+      }
+    }).catch(error => {
+      response.status(500).json({ error: error.message }).end()
+    })
   }
 });
 
