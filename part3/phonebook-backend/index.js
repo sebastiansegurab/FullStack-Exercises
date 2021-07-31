@@ -1,98 +1,58 @@
-const express = require("express");
-const app = express();
-app.use(express.json());
-app.use(express.static("build"));
-const cors = require("cors");
-app.use(cors());
+const express = require("express")
+const app = express()
+app.use(express.json())
+app.use(express.static("build"))
+const cors = require("cors")
+app.use(cors())
 
-require("dotenv").config();
-const mongoose = require("mongoose");
+require("dotenv").config()
+require('./mongo')
+const Person = require('./models/Person')
 
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-  useCreateIndex: true,
-}).then(result => {
-  console.log("Connected to MongoDB")
-}).catch(error => {
-  console.log("Error connecting to MongoDB: ", error.message)
-});
-
-const personSchema = mongoose.Schema({
-  name: String,
-  number: String
-}, {
-  bufferCommands: false
-});
-
-personSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
+app.get("/", (request, response) => {
+  response.send("<h1>Hello World</h1>")
 })
 
-const Person = mongoose.model("Person", personSchema);
-
-app.get("/", (request, response) => {
-  response.send("<h1>Hello World</h1>");
-});
-
-app.get("/", (request, response) => {
-  response.send("<h1>Hello World</h1>");
-});
-
-app.get("/api/persons", (request, response) => {
+app.get("/api/persons", (request, response, next) => {
   Person.find({}).then(persons => {
-    response.json(persons);
-  })
-});
+    response.json(persons)
+  }).catch(error => next(error))
+})
 
-app.get("/api/persons/info", (request, response) => {
-  Person.count({}, function (err, count) {
+app.get("/api/persons/info", (request, response, next) => {
+  Person.countDocuments({}, function (err, count) {
     response.status(200).json({ message: `Phonebook has info for ${count} people ${new Date()}` })
-  })
+  }).catch(error => next(error))
+})
 
-});
+app.get("/api/persons/:id", (request, response, next) => {
+  const { id } = request.params
+  Person.findById(id).then(person => {
+    if (person) {
+      response.json(person)
+    } else {
+      return response.status(404).json({ error: "Person doesn't exists" })
+    }
+  }).catch(error => next(error))
+})
 
-app.get("/api/persons/:id", (request, response) => {
-  const id = request.params.id
-  if (id.length < 24) {
-    response.status(400).json({ error: "Bad request." })
-  } else {
-    Person.findById(id).then(person => {
-      if (person) {
-        response.json(person)
-      } else {
-        return response.status(404).json({ error: "Person doesn't exists" })
-      }
-    }).catch(error => {
-      console.log("Error finding person: ", error.message)
-    })
-  }
-});
-
-app.delete("/api/persons/:id", (request, response) => {
-  const id = request.params.id
+app.delete("/api/persons/:id", (request, response, next) => {
+  const { id } = request.params
   if (id.length < 24) {
     response.status(400).json({ error: "Bad request." })
   } else {
     Person.findByIdAndRemove(id).then(result => {
       if (result) {
-        response.status(200).json({ message: "Person removed" })
+        response.status(204).json({ message: "Person removed" })
       } else {
         return response.status(404).json({ error: "Person doesn't exists" })
       }
-    }).catch(error => {
-      console.log("Error: ", error.message)
-    })
+    }).catch(error => next(error))
   }
-});
+})
 
-app.post("/api/persons", (request, response) => {
-  const { body } = request;
+app.post("/api/persons", (request, response, next) => {
+  const { body } = request
   if (
     body.name === undefined ||
     body.name === null ||
@@ -101,7 +61,7 @@ app.post("/api/persons", (request, response) => {
     body.number === null ||
     body.number === ""
   ) {
-    response.status(400).json({ error: "Content missing." }).end();
+    response.status(400).json({ error: "Content missing." }).end()
   } else {
     Person.find({ name: body.name }).then(person => {
       if (person.length > 0) {
@@ -113,16 +73,24 @@ app.post("/api/persons", (request, response) => {
         })
         person.save().then(person => {
           response.json(person)
+        }).catch(error => {
+          response.status(500).send({ error: error.message }).end()
         })
       }
-    }).catch(error => {
-      response.status(500).json({ error: error.message }).end()
-    })
+    }).catch(error => next(error))
   }
-});
+})
 
-const PORT = process.env.PORT || 3001;
+app.use((error, request, response, next) => {
+  response.status(500).send({ error: error.message }).end()
+})
+
+app.use((request, response) => {
+  response.status(404).send({ error: "Unknown endpoint " })
+})
+
+const PORT = process.env.PORT || 3001
 
 app.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
-});
+  console.log(`Server running on ${PORT}`)
+})
