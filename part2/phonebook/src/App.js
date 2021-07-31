@@ -106,7 +106,7 @@ const App = () => {
 
   const addName = (event) => {
     event.preventDefault()
-    if (newName !== undefined || number !== undefined || newName.trim() !== '' || number.trim() !== '') {
+    if (newName !== undefined && number !== undefined && newName.trim() !== '' && number.trim() !== '') {
       const personExists = persons.find(person => person.name === newName)
       if (personExists === undefined) {
         const personToAdd = {
