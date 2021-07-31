@@ -63,22 +63,26 @@ app.post("/api/persons", (request, response, next) => {
   ) {
     response.status(400).json({ error: "Content missing." }).end()
   } else {
-    Person.find({ name: body.name }).then(person => {
-      if (person.length > 0) {
-        response.status(409).json({ error: "Person already exists." })
-      } else {
-        const person = new Person({
-          name: body.name,
-          number: body.number
-        })
-        person.save().then(person => {
-          response.json(person)
-        }).catch(error => {
-          response.status(500).send({ error: error.message }).end()
-        })
-      }
-    }).catch(error => next(error))
+    const person = new Person({
+      name: body.name,
+      number: body.number
+    })
+    person.save().then(personAdd => {
+      response.json(personAdd)
+    }).catch(error => {
+      response.status(500).send({ error: error.message }).end()
+    })
   }
+})
+
+app.put("/api/persons/:id", (request, response, next) => {
+  const { id } = request.params
+  const { body } = request
+  Person.findByIdAndUpdate(id, body, { new: true }).then(personUpdated => {
+    response.json(personUpdated)
+  }).catch(error => {
+    response.status(500).send({ error: error.message }).end()
+  })
 })
 
 app.use((error, request, response, next) => {
