@@ -56,10 +56,10 @@ app.post("/api/persons", (request, response, next) => {
   if (
     body.name === undefined ||
     body.name === null ||
-    body.name === "" ||
+    body.name.trim() === "" ||
     body.number === undefined ||
     body.number === null ||
-    body.number === ""
+    body.number.trim() === ""
   ) {
     response.status(400).json({ error: "Content missing." }).end()
   } else {
@@ -69,28 +69,30 @@ app.post("/api/persons", (request, response, next) => {
     })
     person.save().then(personAdd => {
       response.json(personAdd)
-    }).catch(error => {
-      response.status(500).send({ error: error.message }).end()
-    })
+    }).catch(error => next(error))
   }
 })
 
 app.put("/api/persons/:id", (request, response, next) => {
   const { id } = request.params
   const { body } = request
-  Person.findByIdAndUpdate(id, body, { new: true }).then(personUpdated => {
+  Person.findByIdAndUpdate(id, body, { runValidators: true, new: true }).then(personUpdated => {
     response.json(personUpdated)
-  }).catch(error => {
-    response.status(500).send({ error: error.message }).end()
-  })
+  }).catch(error => next(error))
 })
 
 app.use((error, request, response, next) => {
-  response.status(500).send({ error: error.message }).end()
+  switch (error.name) {
+    case 'ValidationError':
+      return response.status(400).json({ error: error.message })
+    case 'CastError':
+      return response.status(400).json({ error: 'id malformed' })
+    default: return response.status(500).send({ error: error.message })
+  }
 })
 
 app.use((request, response) => {
-  response.status(404).send({ error: "Unknown endpoint " })
+  response.status(404).send({ error: "Unknown endpoint" })
 })
 
 const PORT = process.env.PORT || 3001

@@ -5,10 +5,12 @@ const personSchema = Schema({
     name: {
         type: String,
         required: true,
+        minLength: 3,
         unique: true
     },
     number: {
         type: String,
+        minLength: 8,
         required: true
     }
 })
