@@ -3,3 +3,6 @@
 
 #requests
 request.rest
+
+#variables
+.env
