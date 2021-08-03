@@ -1,5 +1,5 @@
-const { Schema, model } = require("mongoose")
-const uniqueValidator = require("mongoose-unique-validator")
+const { Schema, model } = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const personSchema = Schema({
     name: {
@@ -15,16 +15,16 @@ const personSchema = Schema({
     }
 })
 
-personSchema.plugin(uniqueValidator)
+personSchema.plugin(uniqueValidator);
 
-personSchema.set('toJSON', {
-    transform: (document, returnedObject) => {
-        returnedObject.id = returnedObject._id.toString()
-        delete returnedObject._id
-        delete returnedObject.__v
-    }
-})
+personSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
 
-const Person = model("Person", personSchema)
+const Person = model("Person", personSchema);
 
-module.exports = Person
+module.exports = Person;
