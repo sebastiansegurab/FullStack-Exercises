@@ -10,9 +10,22 @@ blogRouter.post("/", async (request, response) => {
   if (request.body.likes === null || request.body.likes === undefined) {
     request.body.likes = 0;
   }
-  const blog = new Blog(request.body);
-  const blogCreated = await blog.save();
-  response.status(201).json(blogCreated);
+  if (
+    request.body.title === null ||
+    request.body.title === undefined ||
+    request.body.author === null ||
+    request.body.author === undefined ||
+    request.body.url === null ||
+    request.body.url === undefined
+  ) {
+    response.status(400).send({
+      error: "title, author and url are required",
+    });
+  } else {
+    const blog = new Blog(request.body);
+    const blogCreated = await blog.save();
+    response.status(201).json(blogCreated);
+  }
 });
 
 module.exports = blogRouter;

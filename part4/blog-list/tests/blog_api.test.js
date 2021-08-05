@@ -33,7 +33,7 @@ test("id property exists", async () => {
   expect(response.body.id).toBeDefined();
 });
 
-test("create a note", async () => {
+test("create a blog", async () => {
   const blog4 = {
     title: "title4",
     author: "author4",
@@ -46,7 +46,7 @@ test("create a note", async () => {
   expect(blogsInBD.body[2].author).toBe("author4");
 });
 
-test("create a note without property 'likes', this will be zero", async () => {
+test("create a blog without property 'likes', this will be zero", async () => {
   const blog5 = {
     title: "title5",
     author: "author5",
@@ -55,6 +55,14 @@ test("create a note without property 'likes', this will be zero", async () => {
   await api.post("/api/blogs").send(blog5);
   const blogsInBD = await api.get("/api/blogs");
   expect(blogsInBD.body[2].likes).toBe(0);
+});
+
+test.only("create a blog without some properties is a bad request", async () => {
+  const blog6 = {
+    title: "title5",
+    url: "url5",
+  };
+  await api.post("/api/blogs").send(blog6).expect(400);
 });
 
 afterAll(() => {
