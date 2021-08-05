@@ -23,14 +23,27 @@ test("all blogs are returned", async () => {
 });
 
 test("id property exists", async () => {
-  const blog3 = new Blog({
+  const blog3 = {
     title: "title3",
     author: "author3",
     url: "url3",
     likes: 3,
-  });
-  const response = await blog3.save();
-  expect(response.id).toBeDefined();
+  };
+  const response = await api.post("/api/blogs").send(blog3);
+  expect(response.body.id).toBeDefined();
+});
+
+test("create a note", async () => {
+  const blog4 = {
+    title: "title4",
+    author: "author4",
+    url: "url4",
+    likes: 4,
+  };
+  await api.post("/api/blogs").send(blog4);
+  const blogsInBD = await api.get("/api/blogs");
+  expect(blogsInBD.body).toHaveLength(initialBlogs.length + 1);
+  expect(blogsInBD.body[2].author).toBe("author4");
 });
 
 afterAll(() => {
