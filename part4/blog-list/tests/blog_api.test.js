@@ -46,6 +46,17 @@ test("create a note", async () => {
   expect(blogsInBD.body[2].author).toBe("author4");
 });
 
+test("create a note without property 'likes', this will be zero", async () => {
+  const blog5 = {
+    title: "title5",
+    author: "author5",
+    url: "url5",
+  };
+  await api.post("/api/blogs").send(blog5);
+  const blogsInBD = await api.get("/api/blogs");
+  expect(blogsInBD.body[2].likes).toBe(0);
+});
+
 afterAll(() => {
   mongoose.connection.close();
   server.close();
