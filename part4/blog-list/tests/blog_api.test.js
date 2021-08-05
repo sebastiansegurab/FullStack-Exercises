@@ -22,6 +22,17 @@ test("all blogs are returned", async () => {
   expect(response.body).toHaveLength(initialBlogs.length);
 });
 
+test("id property exists", async () => {
+  const blog3 = new Blog({
+    title: "title3",
+    author: "author3",
+    url: "url3",
+    likes: 3,
+  });
+  const response = await blog3.save();
+  expect(response.id).toBeDefined();
+});
+
 afterAll(() => {
   mongoose.connection.close();
   server.close();
