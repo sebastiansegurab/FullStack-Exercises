@@ -11,8 +11,10 @@ app.use(cors());
 app.use(express.json());
 
 const blogRouter = require("./controllers/blog");
+const userRouter = require("./controllers/user");
 
 app.use("/api/blogs", blogRouter);
+app.use("/api/users", userRouter);
 app.use(errorHandler);
 app.use(unknownEndpoint);
 
