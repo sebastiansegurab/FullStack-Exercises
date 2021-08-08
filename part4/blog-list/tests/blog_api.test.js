@@ -69,12 +69,33 @@ describe("create a blog", () => {
   });
 });
 
-describe.only("get a blog", () => {
+describe("get a blog", () => {
   test("return a blog with the same structure and data", async () => {
     const blogs = await api.get("/api/blogs");
-    const blogToSearch = blogs.body[0]
+    const blogToSearch = blogs.body[0];
     const blog = await api.get(`/api/blogs/${blogToSearch.id}`);
     expect(blog.body).toEqual(blogToSearch);
+  });
+});
+
+describe.only("update a blog", () => {
+  test("increment its likes, return the same blog but with the indicated likes", async () => {
+    const blogs = await api.get("/api/blogs");
+    const blogToSearch = blogs.body[0];
+    const blog = await api.get(`/api/blogs/${blogToSearch.id}`);
+    const objectBlog = {
+      title: blogToSearch.title,
+      author: blogToSearch.author,
+      likes: 10,
+    };
+    const blogUpdated = await api
+      .put(`/api/blogs/${blog.body.id}`)
+      .send(objectBlog);
+    expect(200);
+    expect(blogUpdated.body.id).toBe(blogToSearch.id);
+    expect(blogUpdated.body.title).toBe(blogToSearch.title);
+    expect(blogUpdated.body.author).toBe(blogToSearch.author);
+    expect(blogUpdated.body.likes).toBe(objectBlog.likes);
   });
 });
 
