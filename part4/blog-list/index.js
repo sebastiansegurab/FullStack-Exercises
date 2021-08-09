@@ -13,9 +13,11 @@ app.use(express.json());
 
 const blogRouter = require("./controllers/blog");
 const userRouter = require("./controllers/user");
+const loginRouter = require("./controllers/login");
 
 app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
+app.use("/api/login", loginRouter);
 app.use(errorHandler);
 app.use(unknownEndpoint);
 
