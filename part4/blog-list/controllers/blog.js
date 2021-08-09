@@ -1,30 +1,39 @@
 const blogRouter = require("express").Router();
 const Blog = require("../models/Blog");
+const User = require("../models/User");
 
 blogRouter.get("/", async (request, response) => {
-  const blogs = await Blog.find({});
+  const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 });
   response.json(blogs);
 });
 
-blogRouter.post("/", async (request, response) => {
-  if (request.body.likes === null || request.body.likes === undefined) {
-    request.body.likes = 0;
+blogRouter.post("/", async (request, response, next) => {
+  const { body } = request;
+  if (body.likes === null || body.likes === undefined) {
+    body.likes = 0;
   }
   if (
-    request.body.title === null ||
-    request.body.title === undefined ||
-    request.body.author === null ||
-    request.body.author === undefined ||
-    request.body.url === null ||
-    request.body.url === undefined
+    body.title === null ||
+    body.title === undefined ||
+    body.author === null ||
+    body.author === undefined ||
+    body.url === null ||
+    body.url === undefined
   ) {
     response.status(400).send({
       error: "title, author and url are required",
     });
   } else {
     const blog = new Blog(request.body);
-    const blogCreated = await blog.save();
-    response.status(201).json(blogCreated);
+    try {
+      const blogCreated = await blog.save();
+      const user = await User.findById(body.user);
+      user.blogs = user.blogs.concat(blogCreated._id);
+      await user.save();
+      response.status(201).json(blogCreated);
+    } catch (error) {
+      next(error);
+    }
   }
 });
 

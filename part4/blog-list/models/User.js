@@ -5,6 +5,12 @@ const userSchema = new Schema({
   username: { type: String, unique: true, required: true, minLength: 3 },
   password: { type: String, required: true },
   name: String,
+  blogs: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Blog",
+    },
+  ],
 });
 
 userSchema.plugin(uniqueValidator);
