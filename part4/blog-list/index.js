@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+app.use(express.json());
 const cors = require("cors");
 const logger = require("./utils/logger");
 const { unknownEndpoint, errorHandler } = require("./utils/middleware");
