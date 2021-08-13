@@ -3,7 +3,11 @@ const app = express();
 app.use(express.json());
 const cors = require("cors");
 const logger = require("./utils/logger");
-const { unknownEndpoint, errorHandler } = require("./utils/middleware");
+const {
+  unknownEndpoint,
+  errorHandler,
+  tokenExtractor,
+} = require("./utils/middleware");
 require("dotenv").config();
 
 require("./utils/config");
@@ -15,9 +19,10 @@ const blogRouter = require("./controllers/blog");
 const userRouter = require("./controllers/user");
 const loginRouter = require("./controllers/login");
 
-app.use("/api/blogs", blogRouter);
-app.use("/api/users", userRouter);
+app.use(tokenExtractor);
 app.use("/api/login", loginRouter);
+app.use("/api/users", userRouter);
+app.use("/api/blogs", blogRouter);
 app.use(errorHandler);
 app.use(unknownEndpoint);
 
