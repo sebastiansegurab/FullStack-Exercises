@@ -44,3 +44,12 @@
   font-weight: bold;
   border-radius: .5rem;
 }
+
+.notification-success {
+  background-color: green;
+  padding: 1rem;
+  color: white;
+  font-weight: bold;
+  border-radius: .5rem;
+}
+

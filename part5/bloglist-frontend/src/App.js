@@ -48,7 +48,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } else {
-      setNotification('User or password incorrect.')
+      setNotification({ message: 'User or password incorrect.', status: 'error' })
       setTimeout(() => {
         setNotification(null)
       }, 3000)
@@ -76,19 +76,30 @@ const App = () => {
     event.preventDefault()
     blogService.setToken(user.token)
     const blog = { title, author, url }
-    await blogService.createBlog(blog)
-    const blogs = await blogService.getAll()
-    setBlogs(blogs)
-    setTitle('')
-    setAuthor('')
-    setUrl('')
+    const blogCreated = await blogService.createBlog(blog)
+    if (blogCreated) {
+      const blogs = await blogService.getAll()
+      setBlogs(blogs)
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+      setNotification({ message: `a new blog '${blogCreated.title}' by ${user.name} added.`, status: 'success' })
+      setTimeout(() => {
+        setNotification(null)
+      }, 3000)
+    } else {
+      setNotification({ message: 'The blog could not be created.', status: 'fail' })
+      setTimeout(() => {
+        setNotification(null)
+      }, 3000)
+    }
   }
 
   return <>
+    <Notification notification={notification} />
     {
       user === null || user === undefined ?
         <div>
-          <Notification notification={notification} />
           <Login username={username} password={password} handleUsername={handleUsername} handlePassword={handlePassword}
             handleSubmit={handleSubmit} />
         </div>
