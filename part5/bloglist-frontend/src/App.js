@@ -73,6 +73,23 @@ const App = () => {
     }
   }
 
+  const removeBlog = async (id) => {
+    const response = await blogService.removeBlog(id)
+    if (response) {
+      setNotification({ message: response.message, status: 'success' })
+      setTimeout(() => {
+        setNotification(null)
+      }, 3000)
+      const blogs = await blogService.getAll()
+      setBlogs(blogs)
+    } else {
+      setNotification({ message: 'The blog could not be removed.', status: 'fail' })
+      setTimeout(() => {
+        setNotification(null)
+      }, 3000)
+    }
+  }
+
   return <>
     <Notification notification={notification} />
     {
@@ -89,7 +106,7 @@ const App = () => {
             <CreateBlog addBlog={addBlog} />
           </Toggable>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} addLikeToBlog={addLikeToBlog} />
+            <Blog key={blog.id} blog={blog} addLikeToBlog={addLikeToBlog} removeBlog={removeBlog} />
           )}
         </div>
     }
