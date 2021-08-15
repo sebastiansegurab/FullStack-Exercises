@@ -42,7 +42,7 @@
   padding: 1rem;
   color: white;
   font-weight: bold;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
 }
 
 .notification-success {
@@ -50,6 +50,11 @@
   padding: 1rem;
   color: white;
   font-weight: bold;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
 }
 
+.blog-style {
+  padding: 1rem;
+  border: 0.1rem solid #000;
+  margin-bottom: 0.5rem;
+}
