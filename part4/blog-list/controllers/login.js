@@ -16,7 +16,7 @@ loginRouter.post("/", async (request, response) => {
     const token = jwt.sign(userForToken, process.env.SECRET);
     response
       .status(200)
-      .json({ token, username: user.username, name: user.name });
+      .json({ token, username: user.username, name: user.name, id: user._id.toString() });
   } else {
     response.status(401).json({ error: "User or password incorrect" });
   }

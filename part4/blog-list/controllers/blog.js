@@ -57,11 +57,30 @@ blogRouter.get("/:id", async (request, response) => {
   response.json(blog);
 });
 
-blogRouter.put("/:id", async (request, response) => {
+blogRouter.put("/:id", async (request, response, next) => {
   const { id } = request.params
   const { body } = request;
-  const blogUpdated = await Blog.findByIdAndUpdate(id, body, { new: true });
-  response.status(200).json(blogUpdated);
+  const blog = await Blog.findById(id);
+  if (!blog) {
+    return response.status(404).json({ error: "Blog not found." });
+  }
+  if (!request.token) {
+    return response.status(401).json({ error: "token missing" });
+  }
+  try {
+    const decodedToken = jwt.verify(request.token, process.env.SECRET);
+    if (!(request.token && decodedToken)) {
+      return response.status(401).json({ error: "token missing or invalid." });
+    }
+    const user = await User.findById(decodedToken.id);
+    if (user._id.toString() !== blog.user.toString()) {
+      return response.status(401).json({ error: "User is not the creator of the note." })
+    }
+    const blogUpdated = await Blog.findByIdAndUpdate(id, body, { new: true });
+    response.status(200).json(blogUpdated);
+  } catch (error) {
+    next(error)
+  }
 });
 
 blogRouter.delete("/:id", async (request, response, next) => {

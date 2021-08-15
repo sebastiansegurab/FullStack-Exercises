@@ -24,6 +24,7 @@ const App = () => {
     if (window.localStorage.getItem !== null || window.localStorage.getItem !== undefined) {
       const user = JSON.parse(localStorage.getItem('user'))
       setUser(user)
+      blogService.setToken(user.token)
     }
   }, [])
 
@@ -31,6 +32,7 @@ const App = () => {
     const user = await loginService.login(username, password)
     if (user) {
       setUser(user)
+      blogService.setToken(user.token)
       window.localStorage.setItem('user', JSON.stringify(user))
     } else {
       setNotification({ message: 'User or password incorrect.', status: 'error' })
@@ -46,7 +48,6 @@ const App = () => {
   }
 
   const addBlog = async (blog) => {
-    blogService.setToken(user.token)
     const blogCreated = await blogService.createBlog(blog)
     if (blogCreated) {
       const blogs = await blogService.getAll()
@@ -60,6 +61,15 @@ const App = () => {
       setTimeout(() => {
         setNotification(null)
       }, 3000)
+    }
+  }
+
+  const addLikeToBlog = async (blog) => {
+    blog.user = user.id
+    const blogToAddLike = await blogService.updateBlog(blog)
+    if (blogToAddLike) {
+      const blogs = await blogService.getAll()
+      setBlogs(blogs)
     }
   }
 
@@ -79,7 +89,7 @@ const App = () => {
             <CreateBlog addBlog={addBlog} />
           </Toggable>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
+            <Blog key={blog.id} blog={blog} addLikeToBlog={addLikeToBlog} />
           )}
         </div>
     }
