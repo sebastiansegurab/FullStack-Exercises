@@ -3,18 +3,14 @@ import Blog from './components/Blog'
 import Login from './components/Login'
 import Notification from './components/Notification'
 import CreateBlog from './components/CreateBlog'
+import Toggable from './components/Toggable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
 
   useEffect(() => {
     async function getAllBlogs() {
@@ -31,22 +27,11 @@ const App = () => {
     }
   }, [])
 
-  const handleUsername = (event) => {
-    setUsername(event.target.value)
-  }
-
-  const handlePassword = (event) => {
-    setPassword(event.target.value)
-  }
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
+  const loginUser = async (username, password) => {
     const user = await loginService.login(username, password)
     if (user) {
       setUser(user)
       window.localStorage.setItem('user', JSON.stringify(user))
-      setUsername('')
-      setPassword('')
     } else {
       setNotification({ message: 'User or password incorrect.', status: 'error' })
       setTimeout(() => {
@@ -60,29 +45,12 @@ const App = () => {
     setUser(null)
   }
 
-  const handleTitle = (event) => {
-    setTitle(event.target.value)
-  }
-
-  const handleAuthor = (event) => {
-    setAuthor(event.target.value)
-  }
-
-  const handleUrl = (event) => {
-    setUrl(event.target.value)
-  }
-
-  const handleCreateBlog = async (event) => {
-    event.preventDefault()
+  const addBlog = async (blog) => {
     blogService.setToken(user.token)
-    const blog = { title, author, url }
     const blogCreated = await blogService.createBlog(blog)
     if (blogCreated) {
       const blogs = await blogService.getAll()
       setBlogs(blogs)
-      setTitle('')
-      setAuthor('')
-      setUrl('')
       setNotification({ message: `a new blog '${blogCreated.title}' by ${user.name} added.`, status: 'success' })
       setTimeout(() => {
         setNotification(null)
@@ -100,16 +68,16 @@ const App = () => {
     {
       user === null || user === undefined ?
         <div>
-          <Login username={username} password={password} handleUsername={handleUsername} handlePassword={handlePassword}
-            handleSubmit={handleSubmit} />
+          <Login loginUser={loginUser} />
         </div>
         :
         <div>
           <h2>blogs</h2>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
           <h2>create new</h2>
-          <CreateBlog title={title} author={author} url={url} handleTitle={handleTitle} handleAuthor={handleAuthor}
-            handleUrl={handleUrl} handleCreateBlog={handleCreateBlog} />
+          <Toggable>
+            <CreateBlog addBlog={addBlog} />
+          </Toggable>
           {blogs.map(blog =>
             <Blog key={blog.id} blog={blog} />
           )}
