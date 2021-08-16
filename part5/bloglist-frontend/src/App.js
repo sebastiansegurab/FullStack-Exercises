@@ -21,7 +21,7 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    if (window.localStorage.getItem !== null || window.localStorage.getItem !== undefined) {
+    if (window.localStorage.getItem('user') !== null && window.localStorage.getItem('user') !== undefined) {
       const user = JSON.parse(localStorage.getItem('user'))
       setUser(user)
       blogService.setToken(user.token)
