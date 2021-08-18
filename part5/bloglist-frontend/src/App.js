@@ -102,7 +102,7 @@ const App = () => {
           <h2>blogs</h2>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
           <h2>create new</h2>
-          <Toggable>
+          <Toggable  buttonOnChildren='cancel' buttonOutsideChildren='create new blog'>
             <CreateBlog addBlog={addBlog} />
           </Toggable>
           {blogs.map(blog =>

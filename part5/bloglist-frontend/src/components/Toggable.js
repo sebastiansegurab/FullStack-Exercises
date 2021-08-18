@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const Toggable = ({ children }) => {
+const Toggable = ({ children, buttonOnChildren, buttonOutsideChildren}) => {
     const [visible, setVisible] = useState(false)
 
     return (
@@ -9,12 +9,12 @@ const Toggable = ({ children }) => {
                 <div>
                     {children}
                     <div>
-                        <button onClick={() => setVisible(false)}>cancel</button>
+                        <button onClick={() => setVisible(false)}>{buttonOnChildren}</button>
                     </div>
                 </div>
                 :
                 <div>
-                    <button onClick={() => setVisible(true)}>create new blog</button>
+                    <button onClick={() => setVisible(true)}>{buttonOutsideChildren}</button>
                 </div>
             }
         </>
