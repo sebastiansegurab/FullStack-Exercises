@@ -15,7 +15,7 @@ const Login = ({ loginUser }) => {
     return (
         <div>
             <h2>Log in to application</h2>
-            <form onSubmit={handleLogin}>
+            <form data-test-id="login-form" onSubmit={handleLogin}>
                 <div>
                     username: <input type="text" name="username" value={username} onChange={({ target }) => setUsername(target.value)} required />
                 </div>
