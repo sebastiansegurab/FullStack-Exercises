@@ -87,6 +87,34 @@ describe("Blog app", function () {
                         .and("have.css", "background-color", "rgb(255, 0, 0)")
                 })
             })
+
+            describe('Order blogs', function () {
+                beforeEach(function () {
+                    cy.contains("view").click()
+                    cy.contains("like").click()
+                    cy.contains("like").click()
+                    cy.get("[data-test-id='createBlog-form'] input[name='title']").type("exampleTitle1")
+                    cy.get("[data-test-id='createBlog-form'] input[name='author']").type("exampleAuthor1")
+                    cy.get("[data-test-id='createBlog-form'] input[name='url']").type("exampleUrl1")
+                    cy.get("[data-test-id='createBlog-form'] button").click()
+                    cy.contains("view").click()
+                    cy.get("[data-test-id='buttonLike']").then(buttonsLike => {
+                        cy.wrap(buttonsLike[1]).click()
+                        cy.wait(500)
+                        cy.wrap(buttonsLike[1]).click()
+                        cy.wait(500)
+                        cy.wrap(buttonsLike[1]).click()
+                        cy.wait(500)
+                    })
+                })
+
+                it('The blog with more likes its the first in the list', function () {
+                    cy.visit(urlFront)
+                    cy.get(".blog-style").then(blogs => {
+                        cy.wrap(blogs[0]).contains("exampleTitle1 - exampleAuthor1")
+                    })
+                })
+            })
         })
     })
 })
