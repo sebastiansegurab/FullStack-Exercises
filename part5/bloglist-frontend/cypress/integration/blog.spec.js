@@ -4,7 +4,7 @@ describe("Blog app", function () {
 
     beforeEach(function () {
         cy.request("POST", `${urlAPI}/testing/reset`)
-        cy.visit(`${urlFront}`)
+        cy.visit(urlFront)
     })
 
     it("Login form is shown", function () {
@@ -12,7 +12,7 @@ describe("Blog app", function () {
         cy.contains("log in")
     })
 
-    describe.only('Login', function () {
+    describe('Login', function () {
         beforeEach(function () {
             cy.request("POST", `${urlAPI}/users`, ({
                 "username": "user",
@@ -21,6 +21,7 @@ describe("Blog app", function () {
             })
             )
         })
+
         it('succeeds with correct credentials', function () {
             cy.get("[data-test-id='login-form'] input[name='username']").type("user")
             cy.get("[data-test-id='login-form'] input[name='password']").type("password")
@@ -36,5 +37,22 @@ describe("Blog app", function () {
                 .and("have.css", "background-color", "rgb(255, 0, 0)")
         })
 
+        describe('When logged in', function () {
+            beforeEach(function () {
+                cy.get("[data-test-id='login-form'] input[name='username']").type("user")
+                cy.get("[data-test-id='login-form'] input[name='password']").type("password")
+                cy.get("[data-test-id='login-form'] button").click()
+            })
+
+            it('A blog can be created', function () {
+                cy.contains("create new blog").click()
+                cy.get("[data-test-id='createBlog-form'] input[name='title']").type("exampleTitle")
+                cy.get("[data-test-id='createBlog-form'] input[name='author']").type("exampleAuthor")
+                cy.get("[data-test-id='createBlog-form'] input[name='url']").type("exampleUrl")
+                cy.get("[data-test-id='createBlog-form'] button").click()
+                cy.contains("exampleTitle - exampleAuthor")
+                cy.contains("view")
+            })
+        })
     })
 })

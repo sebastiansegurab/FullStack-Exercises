@@ -17,7 +17,7 @@ const CreateBlog = ({ addBlog }) => {
 
     return (
         <div>
-            <form onSubmit={handleCreateBlog}>
+            <form data-test-id="createBlog-form" onSubmit={handleCreateBlog}>
                 <div>
                     title: <input type="text" value={title} name="title" onChange={({ target }) => setTitle(target.value)} required />
                 </div>
