@@ -42,16 +42,23 @@ describe("Blog app", function () {
                 cy.get("[data-test-id='login-form'] input[name='username']").type("user")
                 cy.get("[data-test-id='login-form'] input[name='password']").type("password")
                 cy.get("[data-test-id='login-form'] button").click()
-            })
-
-            it('A blog can be created', function () {
                 cy.contains("create new blog").click()
                 cy.get("[data-test-id='createBlog-form'] input[name='title']").type("exampleTitle")
                 cy.get("[data-test-id='createBlog-form'] input[name='author']").type("exampleAuthor")
                 cy.get("[data-test-id='createBlog-form'] input[name='url']").type("exampleUrl")
                 cy.get("[data-test-id='createBlog-form'] button").click()
+            })
+
+            it('A blog can be created', function () {
                 cy.contains("exampleTitle - exampleAuthor")
                 cy.contains("view")
+            })
+
+            it('A user can like a blog', function () {
+                cy.contains("view").click()
+                cy.contains("likes 0")
+                cy.contains("like").click()
+                cy.contains("likes 1")
             })
         })
     })
