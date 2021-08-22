@@ -20,6 +20,12 @@ describe("Blog app", function () {
                 "name": "name"
             })
             )
+            cy.request("POST", `${urlAPI}/users`, ({
+                "username": "user1",
+                "password": "password1",
+                "name": "name1"
+            })
+            )
         })
 
         it('succeeds with correct credentials', function () {
@@ -59,6 +65,27 @@ describe("Blog app", function () {
                 cy.contains("likes 0")
                 cy.contains("like").click()
                 cy.contains("likes 1")
+            })
+
+            describe('A user wants deleted a blog', function () {
+                it('if it was created by him/her, it can be deleted', function () {
+                    cy.contains("view").click()
+                    cy.contains("remove").click()
+                    cy.contains("exampleTitle - exampleAuthor").should('not.exist')
+                    cy.contains("view").should('not.exist')
+                })
+
+                it('if it was not created by him/her, it cannot be deleted', function () {
+                    cy.contains("logout").click()
+                    cy.get("[data-test-id='login-form'] input[name='username']").type("user1")
+                    cy.get("[data-test-id='login-form'] input[name='password']").type("password1")
+                    cy.get("[data-test-id='login-form'] button").click()
+                    cy.contains("view").click()
+                    cy.contains("remove").click()
+                    cy.contains("exampleTitle - exampleAuthor")
+                    cy.get(".notification-error").should("contain", "The blog could not be removed.")
+                        .and("have.css", "background-color", "rgb(255, 0, 0)")
+                })
             })
         })
     })
