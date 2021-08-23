@@ -32,6 +32,8 @@ const reducer = (state = initialState, action) => {
         }
         return anecdote
       })
+    case 'NEW_NOTE':
+      return [...state, asObject(action.payload.content)]
     default: return state
   }
 }
