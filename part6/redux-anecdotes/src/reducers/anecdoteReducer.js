@@ -1,12 +1,16 @@
-import { getAll, createAnecdote } from "../services/anecdotes";
+import { getAll, createAnecdote, addVote } from "../services/anecdotes";
 
-export const addVoteToAnecdote = (id) => {
-  return {
-    type: "ADD_VOTE",
-    payload: {
-      id,
-    },
-  };
+export const addVoteToAnecdote = (anecdote) => {
+  return async (dispatch) => {
+    const addVoteAnecdote = await addVote(anecdote)
+    console.log(addVoteAnecdote)
+    dispatch({
+      type: "ADD_VOTE",
+      payload: {
+        addVoteAnecdote
+      },
+    });
+  }
 };
 
 export const addNewAnecdote = (content) => {
@@ -37,13 +41,10 @@ export const initializeAnecdotes = () => {
 const anecdoteReducer = (state = [], action) => {
   switch (action.type) {
     case "ADD_VOTE":
-      const { id } = action.payload;
+      const { addVoteAnecdote } = action.payload;
       return state.map((anecdote) => {
-        if (anecdote.id === id) {
-          return {
-            ...anecdote,
-            votes: anecdote.votes + 1,
-          };
+        if (anecdote.id === addVoteAnecdote.id) {
+          return addVoteAnecdote
         }
         return anecdote;
       });
