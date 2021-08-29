@@ -10,14 +10,11 @@ const AnecdoteForm = () => {
     const addAnecdote = async (event) => {
         event.preventDefault()
         const { target } = event
-        const newAnecdote = await createAnecdote(target.content.value)
-        if (newAnecdote) {
-            dispatch(addNewAnecdote(newAnecdote))
-            dispatch(setNotification(`new anecdote '${newAnecdote.content}' added.`))
-            setTimeout(() => {
-                dispatch(setNotification(''))
-            }, 5000)
-        }
+        dispatch(addNewAnecdote(target.content.value))
+        dispatch(setNotification(`new anecdote '${target.content.value}' added.`))
+        setTimeout(() => {
+            dispatch(setNotification(''))
+        }, 5000)
         target.content.value = ''
     }
 
