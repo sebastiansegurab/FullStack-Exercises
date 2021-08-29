@@ -1,3 +1,5 @@
+import { getAll } from "../services/anecdotes";
+
 export const addVoteToAnecdote = (id) => {
   return {
     type: "ADD_VOTE",
@@ -16,13 +18,16 @@ export const addNewAnecdote = (anecdote) => {
   };
 };
 
-export const initializeAnecdotes = (anecdotes) => {
-  return {
-    type: "INITIAL_ANECDOTES",
-    payload: {
-      anecdotes,
-    },
-  };
+export const initializeAnecdotes = () => {
+  return async (dispatch) => {
+    const anecdotes = await getAll()
+    dispatch({
+      type: "INITIAL_ANECDOTES",
+      payload: {
+        anecdotes,
+      },
+    })
+  }
 };
 
 const anecdoteReducer = (state = [], action) => {
