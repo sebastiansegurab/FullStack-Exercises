@@ -3,7 +3,6 @@ import { getAll, createAnecdote, addVote } from "../services/anecdotes";
 export const addVoteToAnecdote = (anecdote) => {
   return async (dispatch) => {
     const addVoteAnecdote = await addVote(anecdote)
-    console.log(addVoteAnecdote)
     dispatch({
       type: "ADD_VOTE",
       payload: {
