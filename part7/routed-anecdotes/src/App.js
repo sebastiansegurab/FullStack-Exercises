@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Link, Route, Switch, useHistory, useRouteMatch } from "react-router-dom";
+import {
+  Link,
+  Route,
+  Switch,
+  useHistory,
+  useRouteMatch,
+} from "react-router-dom";
 import { useField } from "./hooks";
 
 const Menu = () => {
@@ -71,11 +77,11 @@ const Footer = () => (
 );
 
 const CreateNew = (props) => {
-  const content = useField("text")
-  const author = useField("text")
-  const info = useField("text")
+  const content = useField("text");
+  const author = useField("text");
+  const info = useField("text");
 
-  const history = useHistory()
+  const history = useHistory();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -85,7 +91,14 @@ const CreateNew = (props) => {
       info: info.value,
       votes: 0,
     });
-    history.push("/anecdotes")
+    history.push("/anecdotes");
+  };
+
+  const resetForm = (e) => {
+    e.preventDefault();
+    content.reset();
+    author.reset();
+    info.reset();
   };
 
   return (
@@ -94,17 +107,26 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input {...content} />
+          <input
+            type={content.type}
+            value={content.value}
+            onChange={content.onChange}
+          />
         </div>
         <div>
           author
-          <input {...author} />
+          <input
+            type={author.type}
+            value={author.value}
+            onChange={author.onChange}
+          />
         </div>
         <div>
           url for more info
-          <input {...info} />
+          <input type={info.type} value={info.value} onChange={info.onChange} />
         </div>
         <button>create</button>
+        <button onClick={resetForm}>reset</button>
       </form>
     </div>
   );
@@ -120,6 +142,24 @@ const AnecdoteDetail = ({ anecdote }) => {
       </p>
     </div>
   );
+};
+
+const Notification = ({ notification }) => {
+  const styleNotification = {
+    marginTop: "1rem",
+    padding: "1rem",
+    border: ".1rem solid",
+  };
+
+  if (
+    notification === null ||
+    notification === undefined ||
+    notification.trim() === ""
+  ) {
+    return null;
+  }
+
+  return <div style={styleNotification}>{notification}</div>;
 };
 
 const App = () => {
@@ -140,11 +180,21 @@ const App = () => {
     },
   ]);
 
+  const history = useHistory();
+
   const [notification, setNotification] = useState("");
 
   const addNew = (anecdote) => {
+    if (window.anecdoteNotificationTimeout) {
+      clearTimeout(window.anecdoteNotificationTimeout);
+    }
     anecdote.id = (Math.random() * 10000).toFixed(0);
     setAnecdotes(anecdotes.concat(anecdote));
+    history.push("/anecdotes");
+    setNotification(`a new anecdote '${anecdote.content}' created!`);
+    window.anecdoteNotificationTimeout = setTimeout(() => {
+      setNotification("");
+    }, 10000);
   };
 
   const anecdoteById = (id) => anecdotes.find((a) => a.id === id);
@@ -171,6 +221,7 @@ const App = () => {
       <Menu />
       <Switch>
         <Route exact path={["/", "/anecdotes"]}>
+          <Notification notification={notification} />
           <AnecdoteList anecdotes={anecdotes} />
         </Route>
         <Route path="/about">
