@@ -1,0 +1,25 @@
+{
+  "name": "blog-list",
+  "version": "1.0.0",
+  "description": "",
+  "workspaces": [
+    "api",
+    "app"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run build --workspace=app",
+    "start": "npm run start --workspace=app",
+    "dev:api": "npm run dev --workspace=api",
+    "dev": "npm run build && npm run dev --workspace=api"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "devDependencies": {
+    "cypress": "^8.3.0",
+    "eslint-plugin-jest": "^24.4.0"
+  },
+  "author": "Sebastián Segura",
+  "license": "ISC"
+}

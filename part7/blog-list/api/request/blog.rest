@@ -1,0 +1,20 @@
+GET http://localhost:3001/api/blogs
+
+###
+GET http://localhost:3001/api/blogs/6110973f0f9c01191820ebdf
+
+###
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlbGxhcyIsImlkIjoiNjExMDk3M2YwZjljMDExOTE4MjBlYmRmIiwiaWF0IjoxNjI4ODMwNzc4fQ.H9mEYkfi83wENdvml6xshWdMBxFHAMwtl8jWwCKsM0c
+
+{"title": "BLOG 100", "author": "Sebastian 100", "url": "url100", "likes": 100}
+
+###
+PUT http://localhost:3001/api/blogs/610b5e61c3a5261ad85a4d78
+Content-Type: application/json
+
+{"title": "El blog", "author": "Sebastian", "likes": 10}
+
+POST http://localhost:3001/api/blogs
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlbGxhcyIsImlkIjoiNjExMDk3M2YwZjljMDExOTE4MjBlYmRmIiwiaWF0IjoxNjI4ODMwNzc4fQ.H9mEYkfi83wENdvml6xshWdMBxFHAMwtl8jWwCKsM0c
