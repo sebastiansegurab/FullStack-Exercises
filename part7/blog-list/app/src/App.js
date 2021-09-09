@@ -7,7 +7,7 @@ import Toggable from "./components/Toggable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import { useDispatch, useSelector } from "react-redux";
-import { initializeBlogs } from "./reducers/blogReducer";
+import { initializeBlogs, addNewBlog } from "./reducers/blogReducer";
 import { setNotification } from "./reducers/notificationReducer";
 
 const App = () => {
@@ -48,30 +48,17 @@ const App = () => {
     setUser(null);
   };
 
-  /*const addBlog = async (blog) => {
-    const blogCreated = await blogService.createBlog(blog);
-    if (blogCreated) {
-      const blogs = await blogService.getAll();
-      setBlogs(blogs);
-      setNotification({
-        message: `a new blog '${blogCreated.title}' by ${user.name} added.`,
-        status: "success",
-      });
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
-    } else {
-      setNotification({
-        message: "The blog could not be created.",
-        status: "fail",
-      });
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
-    }
+  const addBlog = (blog) => {
+    dispatch(addNewBlog(blog));
+    dispatch(
+      setNotification(
+        `a new blog '${blog.title}' by ${user.name} added.`,
+        "success"
+      )
+    );
   };
 
-  const addLikeToBlog = async (blog) => {
+  /*const addLikeToBlog = async (blog) => {
     blog.user = user.id;
     const blogToAddLike = await blogService.updateBlog(blog);
     if (blogToAddLike) {
@@ -118,7 +105,7 @@ const App = () => {
             buttonOnChildren="cancel"
             buttonOutsideChildren="create new blog"
           >
-            <CreateBlog /*addBlog={addBlog}*/ />
+            <CreateBlog addBlog={addBlog} />
           </Toggable>
           {blogs.map((blog) => (
             <Blog

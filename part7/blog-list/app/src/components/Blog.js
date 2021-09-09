@@ -23,7 +23,10 @@ const Blog = ({ blog, addLikeToBlog, removeBlog }) => {
         <div>
           {blog.url}
           <br />
-          likes {blog.likes} <button data-test-id="buttonLike" onClick={addLike}>like</button>
+          likes {blog.likes}{" "}
+          <button data-test-id="buttonLike" onClick={addLike}>
+            like
+          </button>
           <br />
           <button onClick={remove}>remove</button>
         </div>
@@ -33,13 +36,12 @@ const Blog = ({ blog, addLikeToBlog, removeBlog }) => {
 };
 
 Blog.propTypes = {
-  blog: PropTypes.exact({
+  blog: PropTypes.shape({
     id: PropTypes.string,
     title: PropTypes.string,
     author: PropTypes.string,
     url: PropTypes.string,
     likes: PropTypes.number,
-    user: PropTypes.object,
   }).isRequired,
   addLikeToBlog: PropTypes.func.isRequired,
   removeBlog: PropTypes.func.isRequired,
