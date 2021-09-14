@@ -7,7 +7,12 @@ import Toggable from "./components/Toggable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import { useDispatch, useSelector } from "react-redux";
-import { initializeBlogs, addNewBlog } from "./reducers/blogReducer";
+import {
+  initializeBlogs,
+  addNewBlog,
+  addLikeBlog,
+  deleteBlog,
+} from "./reducers/blogReducer";
 import { setNotification } from "./reducers/notificationReducer";
 
 const App = () => {
@@ -58,34 +63,20 @@ const App = () => {
     );
   };
 
-  /*const addLikeToBlog = async (blog) => {
-    blog.user = user.id;
-    const blogToAddLike = await blogService.updateBlog(blog);
-    if (blogToAddLike) {
-      const blogs = await blogService.getAll();
-      setBlogs(blogs);
-    }
+  const addLikeToBlog = (blog) => {
+    dispatch(addLikeBlog(blog));
+    dispatch(setNotification(`Blog '${blog.title}' liked.`, "success"));
   };
 
-  const removeBlog = async (id) => {
-    const response = await blogService.removeBlog(id);
-    if (response) {
-      setNotification({ message: response.message, status: "success" });
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
-      const blogs = await blogService.getAll();
-      setBlogs(blogs);
-    } else {
-      setNotification({
-        message: "The blog could not be removed.",
-        status: "fail",
-      });
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
+  const removeBlog = (blog) => {
+    if (blog.user.id !== user.id) {
+      dispatch(
+        setNotification(`User is not the creator of the note.`, "error")
+      );
+      return;
     }
-  };*/
+    dispatch(deleteBlog(blog.id));
+  };
 
   return (
     <>
@@ -111,8 +102,8 @@ const App = () => {
             <Blog
               key={blog.id}
               blog={blog}
-              /*addLikeToBlog={addLikeToBlog}
-              removeBlog={removeBlog}*/
+              addLikeToBlog={addLikeToBlog}
+              removeBlog={removeBlog}
             />
           ))}
         </div>

@@ -13,7 +13,7 @@ const Blog = ({ blog, addLikeToBlog, removeBlog }) => {
 
   const remove = (event) => {
     event.preventDefault();
-    removeBlog(blog.id);
+    removeBlog(blog);
   };
 
   return (

@@ -72,10 +72,6 @@ blogRouter.put("/:id", async (request, response, next) => {
     if (!(request.token && decodedToken)) {
       return response.status(401).json({ error: "token missing or invalid." });
     }
-    const user = await User.findById(decodedToken.id);
-    if (user._id.toString() !== blog.user.toString()) {
-      return response.status(401).json({ error: "User is not the creator of the note." })
-    }
     const blogUpdated = await Blog.findByIdAndUpdate(id, body, { new: true });
     response.status(200).json(blogUpdated);
   } catch (error) {
