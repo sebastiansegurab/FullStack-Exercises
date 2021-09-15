@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Blog from "./components/Blog";
 import Login from "./components/Login";
 import Notification from "./components/Notification";
 import CreateBlog from "./components/CreateBlog";
 import Toggable from "./components/Toggable";
 import blogService from "./services/blogs";
-import loginService from "./services/login";
 import { useDispatch, useSelector } from "react-redux";
 import {
   initializeBlogs,
@@ -14,13 +13,13 @@ import {
   deleteBlog,
 } from "./reducers/blogReducer";
 import { setNotification } from "./reducers/notificationReducer";
+import { setUser, loginUser, logoutUser } from "./reducers/userReducer";
 
 const App = () => {
-  const [user, setUser] = useState(null);
-
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs);
   const notification = useSelector((state) => state.notification);
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(initializeBlogs());
@@ -32,25 +31,18 @@ const App = () => {
       window.localStorage.getItem("user") !== undefined
     ) {
       const user = JSON.parse(localStorage.getItem("user"));
-      setUser(user);
+      dispatch(setUser(user));
       blogService.setToken(user.token);
     }
   }, []);
 
-  const loginUser = async (username, password) => {
-    const user = await loginService.login(username, password);
-    if (user) {
-      setUser(user);
-      blogService.setToken(user.token);
-      window.localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      dispatch(setNotification("User or password incorrect.", "error"));
-    }
+  const login = (username, password) => {
+    dispatch(loginUser(username, password));
   };
 
   const handleLogout = () => {
     window.localStorage.removeItem("user");
-    setUser(null);
+    dispatch(logoutUser());
   };
 
   const addBlog = (blog) => {
@@ -83,7 +75,7 @@ const App = () => {
       <Notification notification={notification} />
       {user === null || user === undefined ? (
         <div>
-          <Login loginUser={loginUser} />
+          <Login loginUser={login} />
         </div>
       ) : (
         <div>
