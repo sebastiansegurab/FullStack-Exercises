@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import Blog from "./components/Blog";
 import Login from "./components/Login";
+import Users from "./components/Users";
 import Notification from "./components/Notification";
 import CreateBlog from "./components/CreateBlog";
 import Toggable from "./components/Toggable";
@@ -14,15 +15,21 @@ import {
 } from "./reducers/blogReducer";
 import { setNotification } from "./reducers/notificationReducer";
 import { setUser, loginUser, logoutUser } from "./reducers/userReducer";
+import { initializeUsers } from "./reducers/usersReducer";
 
 const App = () => {
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs);
   const notification = useSelector((state) => state.notification);
   const user = useSelector((state) => state.user);
+  const users = useSelector((state) => state.users);
 
   useEffect(() => {
     dispatch(initializeBlogs());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(initializeUsers());
   }, [dispatch]);
 
   useEffect(() => {
@@ -34,7 +41,7 @@ const App = () => {
       dispatch(setUser(user));
       blogService.setToken(user.token);
     }
-  }, []);
+  }, [dispatch]);
 
   const login = (username, password) => {
     dispatch(loginUser(username, password));
@@ -83,6 +90,8 @@ const App = () => {
           <p>
             {user.name} logged in <button onClick={handleLogout}>logout</button>
           </p>
+          <h2>Users</h2>
+          <Users users={users} />
           <h2>create new</h2>
           <Toggable
             buttonOnChildren="cancel"
