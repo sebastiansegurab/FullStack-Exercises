@@ -113,12 +113,16 @@ const typeDefs = gql`
   }
 
   type Mutation {
-      addBook(
-          title: String!
-          author: String!
-          published: Int!
-          genres: [String!]!
-      ): Book
+    addBook(
+      title: String!
+      author: String!
+      published: Int!
+      genres: [String!]!
+    ): Book
+    editAuthor(
+        name: String!
+        setBornTo: Int!
+    ): Author
   }
 `;
 
@@ -146,7 +150,7 @@ const resolvers = {
         books.map((book) => {
           book.genres.map((genre) => {
             if (genre === args.genre) {
-                booksToReturn = booksToReturn.concat(book);
+              booksToReturn = booksToReturn.concat(book);
             }
           });
         });
@@ -177,7 +181,18 @@ const resolvers = {
       if (!authorExists) {
         authors = authors.concat({ name: args.author, id: uuidv4() });
       }
-      return book
+      return book;
+    },
+    editAuthor: (root, args) => {
+      const author = authors.find((author) => author.name === args.name);
+      if (author) {
+        const updateAuthor = { ...author, born: args.setBornTo };
+        authors = authors.map((author) =>
+          author.name === args.name ? updateAuthor : author
+        );
+        return updateAuthor;
+      }
+      return null;
     },
   },
 };
