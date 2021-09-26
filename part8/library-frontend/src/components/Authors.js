@@ -18,8 +18,12 @@ const Authors = (props) => {
   if (!props.show) {
     return null
   }
-  
+
   const authors = result.data !== undefined ? result.data.allAuthors : []
+
+  if (authors.length === 0) {
+    return (<div><strong>There are no authors.</strong></div>)
+  }
 
   return (
     <div>
