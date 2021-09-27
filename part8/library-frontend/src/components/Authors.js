@@ -29,7 +29,7 @@ const Authors = (props) => {
   const editAuthor = async (event) => {
     event.preventDefault()
 
-    updateAuthorBirthday({ variables: { name, born } })
+    updateAuthorBirthday({ variables: { name: name === '' ? authors[0].name : name, born } })
     setName('')
     setBorn('')
   }
@@ -60,10 +60,13 @@ const Authors = (props) => {
       <h2>Set Birthday</h2>
       <form onSubmit={editAuthor}>
         <div>
-          name <input
-            value={name}
+          author <select value={name}
             onChange={({ target }) => setName(target.value)}
-          />
+          >
+            {authors.map(a =>
+              <option key={a.name} value={a.name}>{a.name}</option>
+            )}
+          </select>
         </div>
         <div>
           born <input
