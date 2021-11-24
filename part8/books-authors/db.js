@@ -3,9 +3,9 @@ import dotenv from "dotenv"
 dotenv.config()
 
 mongoose.connect(process.env.MONGODB_URI)
-.then(res => {
-    console.log("Connected to MongoDB")
-})
-.catch(error => {
-    console.error("Error connecting to MongoDB: "+ error.message)
-})
+    .then(res => {
+        console.log("Connected to MongoDB")
+    })
+    .catch(error => {
+        console.error("Error connecting to MongoDB: " + error.message)
+    })
