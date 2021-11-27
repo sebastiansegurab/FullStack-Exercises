@@ -10,7 +10,7 @@
   "author": "Sebastián Segura",
   "license": "ISC",
   "dependencies": {
-    "apollo-server": "^3.3.0",
+    "apollo-server": "^3.5.0",
     "dotenv": "^10.0.0",
     "graphql": "^15.5.3",
     "jsonwebtoken": "^8.5.1",

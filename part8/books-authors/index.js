@@ -1,4 +1,4 @@
-import { ApolloServer, gql } from "apollo-server"
+import { ApolloServer, AuthenticationError, gql, UserInputError } from "apollo-server"
 import Book from "./models/book.js"
 import Author from "./models/author.js"
 import User from "./models/user.js"
@@ -6,7 +6,6 @@ import dotenv from "dotenv"
 dotenv.config()
 import "./db.js"
 import jwt from "jsonwebtoken"
-import { AuthenticationError } from "apollo-server-errors"
 
 const typeDefs = gql`
   type Book {
