@@ -22,10 +22,6 @@ const Books = (props) => {
 
   const genres = new Set([].concat(...books.map(b => b.genres)))
 
-  const buttonGenre = (genre) => {
-    return (<button>genre</button>)
-  }
-
   return (
     <div>
       <h2>books</h2>

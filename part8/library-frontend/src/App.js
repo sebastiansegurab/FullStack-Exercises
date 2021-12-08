@@ -5,12 +5,13 @@ import Books from './components/Books'
 import NewBook from './components/NewBook'
 import Login from './components/Login'
 import Notification from './components/Notification'
+import Recommended from "./components/Recommended"
 import { useApolloClient } from '@apollo/client'
 
 const App = () => {
   const [page, setPage] = useState('authors')
   const [error, setError] = useState(null)
-  const [token, setToken] = useState(null)
+  const [token, setToken] = useState(localStorage.getItem("library-app-user-token"))
 
   const client = useApolloClient()
 
@@ -30,11 +31,12 @@ const App = () => {
       <div>
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>
-        
+
         {token
           ? (
             <>
               <button onClick={() => setPage('add')}>add book</button>
+              <button onClick={() => setPage('recommended')}>recommended</button>
               <button onClick={() => logout()}>logout</button>
             </>
           )
@@ -53,6 +55,11 @@ const App = () => {
 
       <Books
         show={page === 'books'}
+      />
+
+      <Recommended
+        token={token}
+        show={page === 'recommended'}
       />
 
       <NewBook
