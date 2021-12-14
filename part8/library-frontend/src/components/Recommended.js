@@ -21,8 +21,8 @@ const Recommended = (props) => {
         return <div>loading...</div>
     }
 
-    const books = resultBooks.data !== undefined ? resultBooks.data.allBooks : []
-    const user = resultMe.data !== undefined ? resultMe.data.me : null
+    const books = resultBooks.data ? resultBooks.data.allBooks : []
+    const user = resultMe.data ? resultMe.data.me : null
 
     if (books.length === 0) {
         return (<div><strong>There are no books.</strong></div>)

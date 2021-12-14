@@ -11,7 +11,7 @@ import { useApolloClient } from '@apollo/client'
 const App = () => {
   const [page, setPage] = useState('authors')
   const [error, setError] = useState(null)
-  const [token, setToken] = useState(localStorage.getItem("library-app-user-token"))
+  const [token, setToken] = useState(null)
 
   const client = useApolloClient()
 
@@ -24,6 +24,7 @@ const App = () => {
     setToken(null)
     localStorage.removeItem("library-app-user-token")
     client.resetStore()
+    setPage('authors')
   }
 
   return (
@@ -33,7 +34,8 @@ const App = () => {
         <button onClick={() => setPage('books')}>books</button>
 
         {token
-          ? (
+          ?
+          (
             <>
               <button onClick={() => setPage('add')}>add book</button>
               <button onClick={() => setPage('recommended')}>recommended</button>
@@ -57,14 +59,20 @@ const App = () => {
         show={page === 'books'}
       />
 
-      <Recommended
-        token={token}
-        show={page === 'recommended'}
-      />
+      {token
+        ?
+        <>
+          <Recommended
+            token={token}
+            show={page === 'recommended'}
+          />
 
-      <NewBook
-        show={page === 'add'}
-      />
+          <NewBook
+            show={page === 'add'}
+          />
+        </>
+        : null
+      }
 
       <Login
         setPage={setPage}
