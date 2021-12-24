@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
@@ -19,6 +19,14 @@ const App = () => {
     setError(message)
     setTimeout(() => setError(null), 5000)
   }
+
+  useEffect(() => {
+    setToken(
+      localStorage.getItem("library-app-user-token") === undefined
+        || localStorage.getItem("library-app-user-token") === null
+        ? null
+        : localStorage.getItem("library-app-user-token"))
+  })
 
   const logout = () => {
     setToken(null)
@@ -52,7 +60,9 @@ const App = () => {
       }
 
       <Authors
+        token={token}
         show={page === 'authors'}
+        notifyError={notifyError}
       />
 
       <Books
@@ -68,7 +78,9 @@ const App = () => {
           />
 
           <NewBook
+            token={token}
             show={page === 'add'}
+            notifyError={notifyError}
           />
         </>
         : null

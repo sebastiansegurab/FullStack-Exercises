@@ -19,7 +19,7 @@ const Login = ({ setPage, show, setToken, notifyError }) => {
             localStorage.setItem("library-app-user-token", token)
             if (token) setPage("authors")
         }
-    }, [result.data])
+    }, [result.data, setPage, setToken])
 
     if (!show) {
         return null

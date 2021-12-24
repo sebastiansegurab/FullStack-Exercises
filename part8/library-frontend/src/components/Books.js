@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useLazyQuery, useQuery } from "@apollo/client"
 import { ALL_BOOKS, ALL_BOOKS_BY_GENRE } from '../queries'
 
 const Books = (props) => {
   const resultAllBooks = useQuery(ALL_BOOKS)
   const [genreSelected, setGenreSelected] = useState(null)
-  const [getBooksByGenre, { loading: resultLoadingBooksByGenre, error, data: resultDataBooksByGenre }] = useLazyQuery(ALL_BOOKS_BY_GENRE);
+  const [getBooksByGenre, { loading: resultLoadingBooksByGenre, data: resultDataBooksByGenre }] = useLazyQuery(ALL_BOOKS_BY_GENRE);
 
   if (!props.show) {
     return null

@@ -9,6 +9,14 @@ const Authors = (props) => {
 
   const result = useQuery(ALL_AUTHORS)
   const [updateAuthorBirthday] = useMutation(UPDATE_AUTHOR_BIRTHDAY, {
+    context: {
+      headers: {
+        "Authorization": `bearer ${props.token}`
+      }
+    },
+    onError: (error) => {
+      props.notifyError(error.graphQLErrors[0].message)
+    },
     refetchQueries: [{ query: ALL_AUTHORS }]
   })
 
