@@ -1,4 +1,12 @@
-import { ApolloServer, AuthenticationError, gql, UserInputError } from "apollo-server"
+import { ApolloServer } from 'apollo-server-express';
+import { ApolloServerPluginDrainHttpServer, gql } from 'apollo-server-core';
+import { UserInputError, AuthenticationError } from 'apollo-server-errors';
+import express from 'express';
+import http from 'http';
+import { execute, subscribe } from 'graphql';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+
 import Book from "./models/book.js"
 import Author from "./models/author.js"
 import User from "./models/user.js"
@@ -65,7 +73,14 @@ const typeDefs = gql`
       password: String!
     ): Token
   }
+
+  type Subscription {
+    bookAdded: Book!
+  }
 `;
+
+import { PubSub } from 'graphql-subscriptions';
+const pubsub = new PubSub();
 
 const resolvers = {
   Query: {
@@ -82,12 +97,14 @@ const resolvers = {
       if (!user) throw new AuthenticationError("not authenticated.")
       const book = new Book({ ...args })
       try {
-        return await book.save()
+        await book.save()
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args
         })
       }
+      pubsub.publish("BOOK_ADDED", { bookAdded: book })
+      return book
     },
     addAuthor: async (root, args) => {
       const author = new Author({ ...args })
@@ -139,11 +156,38 @@ const resolvers = {
       }
     }
   },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(["BOOK_ADDED"])
+    }
+  }
 };
 
+const app = express();
+const httpServer = http.createServer(app);
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+const subscriptionServer = SubscriptionServer.create({
+  schema,
+  execute,
+  subscribe,
+}, {
+  server: httpServer,
+  path: '/graphql',
+});
 const server = new ApolloServer({
-  typeDefs,
-  resolvers,
+  schema,
+  plugins: [
+    {
+      async serverWillStart() {
+        return {
+          async drainServer() {
+            subscriptionServer.close();
+          }
+        };
+      }
+    },
+    ApolloServerPluginDrainHttpServer({ httpServer })
+  ],
   context: async ({ req }) => {
     if (!req) {
       return null
@@ -160,7 +204,8 @@ const server = new ApolloServer({
     }
   }
 });
+await server.start();
+server.applyMiddleware({ app });
 
-server.listen().then(({ url }) => {
-  console.log(`Server ready at ${url}`);
-});
+await new Promise(resolve => httpServer.listen({ port: 4000 }, resolve));
+console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
