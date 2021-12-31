@@ -10,13 +10,18 @@
   "author": "Sebastián Segura",
   "license": "ISC",
   "dependencies": {
-    "apollo-server": "^3.5.0",
+    "@graphql-tools/schema": "^8.3.1",
+    "apollo-server-core": "^3.6.1",
+    "apollo-server-express": "^3.6.1",
     "dotenv": "^10.0.0",
-    "graphql": "^15.5.3",
+    "express": "^4.17.2",
+    "graphql": "^15.8.0",
+    "graphql-subscriptions": "^2.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.13",
     "mongoose-unique-validator": "^3.0.0",
     "nodemon": "^2.0.15",
+    "subscriptions-transport-ws": "^0.11.0",
     "uuid": "^8.3.2"
   }
 }

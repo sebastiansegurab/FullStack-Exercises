@@ -6,11 +6,13 @@ import NewBook from './components/NewBook'
 import Login from './components/Login'
 import Notification from './components/Notification'
 import Recommended from "./components/Recommended"
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient, useSubscription } from '@apollo/client'
+import { BOOK_ADDED } from './queries'
 
 const App = () => {
   const [page, setPage] = useState('authors')
   const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
   const [token, setToken] = useState(null)
 
   const client = useApolloClient()
@@ -20,12 +22,15 @@ const App = () => {
     setTimeout(() => setError(null), 5000)
   }
 
-  useEffect(() => {
-    setToken(
-      localStorage.getItem("library-app-user-token") === undefined
-        || localStorage.getItem("library-app-user-token") === null
-        ? null
-        : localStorage.getItem("library-app-user-token"))
+  const notifySuccess = (message) => {
+    setSuccess(message)
+    setTimeout(() => setSuccess(null), 5000)
+  }
+
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      notifySuccess(subscriptionData.data.bookAdded.title);
+    }
   })
 
   const logout = () => {
@@ -54,8 +59,8 @@ const App = () => {
         }
       </div>
 
-      {error
-        ? <Notification error={error} />
+      {success
+        ? <Notification error={error} success={success} />
         : null
       }
 
