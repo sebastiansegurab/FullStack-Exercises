@@ -26,7 +26,8 @@ const typeDefs = gql`
 
   type Author {
     name: String!
-    born: Int
+    born: Int!
+    bookCount: Int!
     id: ID!
   }
 
@@ -88,7 +89,22 @@ const resolvers = {
     authorCount: async () => await Author.collection.countDocuments(),
     allBooks: async () => await Book.find({}),
     allBooksByGenre: async (root, args) => await Book.find({ genres: { $in: [args.genre] } }),
-    allAuthors: async () => await Author.find({}),
+    allAuthors: async () => {
+      const authors = await Author.find({})
+      const books = await Book.find({}).populate('author')
+      return authors.map((author) => {
+        const bookCount = books.reduce(
+          (a, book) => (book.author == author.name ? a + 1 : a),
+          0
+        )
+        return {
+          name: author.name,
+          id: author._id,
+          born: author.born,
+          bookCount
+        }
+      })
+    },
     me: (root, args, context) => context.user
   },
   Mutation: {
@@ -125,22 +141,24 @@ const resolvers = {
       }
       author.born = args.setBornTo
       try {
-        return await author.save()
+        await author.save()
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args
         })
       }
+      return author
     },
     createUser: async (root, args) => {
       const user = new User({ ...args })
       try {
-        return await user.save()
+        await user.save()
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args
         })
       }
+      return user
     },
     login: async (root, args) => {
       const user = await User.findOne({ name: args.name })
