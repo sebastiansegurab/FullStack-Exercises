@@ -8,6 +8,21 @@ interface Result {
   average: number
 }
 
+const parseArguments
+ = (args: Array<string>): Data => {
+  if (args.length < 9) throw new Error('Not enough arguments');
+  if (args.length > 9) throw new Error('Too many arguments');
+
+  if (!isNaN(Number(args[2])) && !isNaN(Number(args[3]))) {
+    return {
+      height: Number(args[2]),
+      weight: Number(args[3])
+    }
+  } else {
+    throw new Error('Provided values were not numbers!');
+  }
+}
+
 function calculateExercises(array: number[]): Result {
   const trainingDays: number = array.filter(n => n > 0).length
   let rating: number = 0
