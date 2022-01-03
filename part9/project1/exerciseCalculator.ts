@@ -8,7 +8,7 @@ interface Result {
   average: number
 }
 
-function calculateExercises(array: number[]): Result {
+export function calculateExercises(array: number[], targetP: number): Result {
   const trainingDays: number = array.filter(n => n > 0).length;
   let rating = 0;
   let ratingDescription = "";
@@ -29,10 +29,8 @@ function calculateExercises(array: number[]): Result {
     success,
     rating,
     ratingDescription,
-    target: success ? 2 : 1,
+    target: targetP,
     average: array.reduce((a, b) => a + b, 0) / array.length
   };
   return result;
 }
-
-calculateExercises([3, 0, 2, 4.5, 0, 3, 1]);
