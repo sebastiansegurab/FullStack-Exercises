@@ -1,6 +1,7 @@
 import patientData from "../data/patients.json";
 import { NewPatient, NonSensitivePatient, Patient } from "../types";
 import { v4 as uuidv4 } from 'uuid';
+import { parseDate, parseGender, parseString } from "../utils/validation";
 
 const patients: Array<Patient> = patientData as Array<Patient>;
 
@@ -23,4 +24,15 @@ const addPatient = (object: NewPatient): Patient => {
     return patient
 };
 
-export default { getPatients, addPatient };
+const toPatientObject = (object: any): NewPatient => {
+    const patient: NewPatient = {
+        name: parseString(object.name),
+        dateOfBirth: parseDate(object.dateOfBirth),
+        ssn: parseString(object.ssn),
+        gender: parseGender(object.gender),
+        occupation: parseString(object.occupation),
+    }
+    return patient
+}
+
+export default { getPatients, addPatient, toPatientObject };
