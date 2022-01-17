@@ -1,11 +1,11 @@
 import patientData from "../data/patients.json";
-import { NewPatient, NonSensitivePatient, Patient } from "../types";
+import { NewPatient, Patient, PublicPatient } from "../types";
 import { v4 as uuidv4 } from 'uuid';
 import { parseDate, parseGender, parseString } from "../utils/validation";
 
 const patients: Array<Patient> = patientData as Array<Patient>;
 
-const getPatients = (): NonSensitivePatient[] => {
+const getPatients = (): PublicPatient[] => {
     return patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
         id,
         name,
@@ -13,6 +13,10 @@ const getPatients = (): NonSensitivePatient[] => {
         gender,
         occupation,
     }));
+};
+
+const getPatient = (id: string): PublicPatient | undefined => {
+    return patients.find(p => p.id === id);
 };
 
 const addPatient = (object: NewPatient): Patient => {
@@ -31,8 +35,9 @@ const toPatientObject = (object: any): NewPatient => {
         ssn: parseString(object.ssn),
         gender: parseGender(object.gender),
         occupation: parseString(object.occupation),
+        entries: []
     }
     return patient
 }
 
-export default { getPatients, addPatient, toPatientObject };
+export default { getPatients, getPatient, addPatient, toPatientObject };
