@@ -8,11 +8,11 @@ import { useStateValue } from "./state";
 import { Patient } from "./types";
 
 import PatientListPage from "./PatientListPage";
+import PatientPage from "./PatientPage";
 
 const App: React.FC = () => {
   const [, dispatch] = useStateValue();
   React.useEffect(() => {
-    void axios.get<void>(`${apiBaseUrl}/ping`);
 
     const fetchPatientList = async () => {
       try {
@@ -37,11 +37,12 @@ const App: React.FC = () => {
           </Button>
           <Divider hidden />
           <Switch>
+            <Route path="/patients/:id" render={() => <PatientPage />} />
             <Route path="/" render={() => <PatientListPage />} />
-          </Switch>
-        </Container>
-      </Router>
-    </div>
+        </Switch>
+      </Container>
+    </Router>
+    </div >
   );
 };
 

@@ -6,10 +6,11 @@ import { parseDate, parseGender, parseString } from "../utils/validation";
 const patients: Array<Patient> = patientData as Array<Patient>;
 
 const getPatients = (): PublicPatient[] => {
-    return patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
+    return patients.map(({ id, name, dateOfBirth, ssn, gender, occupation }) => ({
         id,
         name,
         dateOfBirth,
+        ssn,
         gender,
         occupation,
     }));
