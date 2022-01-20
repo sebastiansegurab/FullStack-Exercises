@@ -1,22 +1,23 @@
 import patientData from "../data/patients";
-import { NewPatient, Patient, PublicPatient } from "../types";
+import { NewPatient, Patient } from "../types";
 import { v4 as uuidv4 } from 'uuid';
 import { parseDate, parseGender, parseString } from "../utils/validation";
 
 const patients: Array<Patient> = patientData as Array<Patient>;
 
-const getPatients = (): PublicPatient[] => {
-    return patients.map(({ id, name, dateOfBirth, ssn, gender, occupation }) => ({
+const getPatients = (): Patient[] => {
+    return patients.map(({ id, name, dateOfBirth, ssn, gender, occupation, entries}) => ({
         id,
         name,
         dateOfBirth,
         ssn,
         gender,
         occupation,
+        entries
     }));
 };
 
-const getPatient = (id: string): PublicPatient | undefined => {
+const getPatient = (id: string): Patient | undefined => {
     return patients.find(p => p.id === id);
 };
 
