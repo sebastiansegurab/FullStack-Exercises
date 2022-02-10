@@ -3,6 +3,7 @@ import { Patient } from "../types";
 import { useStateValue } from "../state";
 import { useParams } from "react-router-dom";
 import { Icon } from "semantic-ui-react";
+import EntryDetails from "./EntryDetails";
 
 const PatientPage: React.FC = () => {
     const [{ patients }] = useStateValue();
@@ -36,30 +37,13 @@ const PatientPage: React.FC = () => {
                             <h4>entries</h4>
                             {
                                 patient.entries.map(e => {
-                                    return (
-                                        <div key={e.id}>
-                                            <p>{e.date} {e.description}</p>
-                                            <ul>
-                                                {
-                                                    e.diagnosisCodes !== undefined && e.diagnosisCodes != null
-                                                        ?
-                                                        e.diagnosisCodes.length > 0
-                                                            ?
-                                                            e.diagnosisCodes.map(d => {
-                                                                return <li key={d}>{d}</li>;
-                                                            })
-                                                            : null
-                                                        : null
-                                                }
-                                            </ul>
-                                        </div>
-                                    );
+                                    return <EntryDetails key={e.id} entry={e} />;
                                 })
                             }
                         </div>
                         : null
                 }
-            </div>
+            </div >
         );
     }
 
