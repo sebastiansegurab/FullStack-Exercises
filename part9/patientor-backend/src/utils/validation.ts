@@ -1,4 +1,4 @@
-import { Gender } from "../types"
+import { Discharge, Entry, Gender, HealthCheckRating, NewBaseEntry, SickLeave } from "../types"
 
 export const parseString = (text: any): string => {
     if (!text || !isString(text)) {
@@ -31,4 +31,70 @@ const isDate = (date: string): boolean => {
 
 const isGender = (param: any): param is Gender => {
     return Object.values(Gender).includes(param)
+}
+
+const isEntry = (param: any): param is Entry => {
+    return param.type === "Hospital" || param.type === "OccupationalHealthcare" || param.type === "HealthCheck";
+}
+
+export const parseDischarge = (discharge: any): Discharge => {
+    if (!discharge) {
+        throw new Error("Missing discharge");
+    }
+    if (!discharge.date) {
+        throw new Error("Missing parameter date");
+    }
+    const dischargeDate = parseDate(discharge.date);
+    if (!discharge.criteria) {
+        throw new Error("Missing parameter criteria");
+    }
+    const dischargeCriteria = parseString(discharge.criteria);
+    return {
+        date: dischargeDate,
+        criteria: dischargeCriteria
+    }
+}
+
+export const parseSickLeave = (sickLeave: any): SickLeave => {
+    if (!sickLeave) {
+        throw new Error("Missing sickLeave");
+    }
+    if (!sickLeave.startDate) {
+        throw new Error("Missing parameter startDate");
+    }
+    const sickLeaveStartDate = parseDate(sickLeave.startDate);
+    if (!sickLeave.endDate) {
+        throw new Error("Missing parameter endDate");
+    }
+    const sickLeaveEndDate = parseDate(sickLeave.endDate);
+    return {
+        startDate: sickLeaveStartDate,
+        endDate: sickLeaveEndDate
+    }
+}
+
+export const isHealthCheckRating = (param: any): param is HealthCheckRating => {
+    return Object.values(HealthCheckRating).includes(param)
+}
+
+export const parseHealthCheckRating = (healthCheckRating: any): HealthCheckRating => {
+    if (!healthCheckRating || !isString(healthCheckRating) || !isHealthCheckRating(healthCheckRating)) {
+        throw new Error("Incorrect or missing healthCheckRating " + healthCheckRating)
+    }
+    return healthCheckRating;
+}
+
+export const parseEntry = (entry: any): NewBaseEntry => {
+    if (!entry || !isEntry(entry)) {
+        throw new Error("Missing entry or incorrect type");
+    }
+    const descriptionParam = parseString(entry.description);
+    const dateParam = parseDate(entry.date);
+    const specialistParam = parseString(entry.specialist);
+    return {
+        description: descriptionParam,
+        date: dateParam,
+        specialist: specialistParam,
+        diagnosisCodes: []
+    }
 }

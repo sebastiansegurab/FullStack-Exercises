@@ -29,4 +29,19 @@ router.post('/', (req, res) => {
     }
 })
 
+router.post('/:id/entries', (req, res) => {
+    try {
+        const patient = patientService.getPatients().find(p => p.id === req.params.id);
+        const newEntry = patientService.toEntryObject(req.body)
+        if(patient && newEntry){
+            const entry = patientService.addEntry(patient, req.body);
+            res.status(201).json(entry)
+        }
+    } catch (err) {
+        if (err instanceof Error) {
+            res.status(400).send(err.message)
+        }
+    }
+})
+
 export default router;
