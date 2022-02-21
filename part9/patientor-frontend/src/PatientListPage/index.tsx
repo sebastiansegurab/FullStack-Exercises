@@ -7,7 +7,7 @@ import AddPatientModal from "../AddPatientModal";
 import { Patient } from "../types";
 import { apiBaseUrl } from "../constants";
 import HealthRatingBar from "../components/HealthRatingBar";
-import { addPatient, useStateValue } from "../state";
+import { updatePatient, useStateValue } from "../state";
 import { Link } from "react-router-dom";
 
 const PatientListPage: React.FC = () => {
@@ -29,7 +29,7 @@ const PatientListPage: React.FC = () => {
         `${apiBaseUrl}/patients`,
         values
       );
-      dispatch(addPatient(newPatient));
+      dispatch(updatePatient(newPatient));
       closeModal();
     } catch (e) {
       console.error(e.response?.data || 'Unknown Error');

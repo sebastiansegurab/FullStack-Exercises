@@ -1,14 +1,42 @@
 import React from "react";
 import { Patient } from "../types";
-import { useStateValue } from "../state";
+import { updatePatient, useStateValue } from "../state";
 import { useParams } from "react-router-dom";
-import { Icon } from "semantic-ui-react";
+import { Button, Icon } from "semantic-ui-react";
 import EntryDetails from "./EntryDetails";
+import { apiBaseUrl } from "../constants";
+import axios from "axios";
+import { EntryFormValues } from "../AddEntryModal/AddEntryForm";
+import AddEntryModal from "../AddEntryModal";
 
 const PatientPage: React.FC = () => {
-    const [{ patients }] = useStateValue();
+    const [{ patients }, dispatch] = useStateValue();
+
+    const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+    const [error, setError] = React.useState<string | undefined>();
+
+    const openModal = (): void => setModalOpen(true);
+
+    const closeModal = (): void => {
+        setModalOpen(false);
+        setError(undefined);
+    };
 
     const { id } = useParams<{ id: string }>();
+
+    const submitNewEntry = async (values: EntryFormValues) => {
+        try {
+            const { data: patient } = await axios.post<Patient>(
+                `${apiBaseUrl}/patients/${id}/entries`,
+                values
+            );
+            dispatch(updatePatient(patient));
+            closeModal();
+        } catch (e) {
+            console.error(e.response?.data || 'Unknown Error');
+            setError(e.response?.data?.error || 'Unknown error');
+        }
+    };
 
     const patient = Object.values(patients).find((p: Patient) => p.id === id);
 
@@ -43,7 +71,15 @@ const PatientPage: React.FC = () => {
                         </div>
                         : null
                 }
-            </div >
+                <AddEntryModal
+                    modalOpen={modalOpen}
+                    onSubmit={submitNewEntry}
+                    error={error}
+                    onClose={closeModal}
+                />
+                <div></div>
+                <Button style={{marginTop: 20}} onClick={() => openModal()}>Add New Entry</Button>
+            </div>
         );
     }
 

@@ -34,8 +34,8 @@ router.post('/:id/entries', (req, res) => {
         const patient = patientService.getPatients().find(p => p.id === req.params.id);
         const newEntry = patientService.toEntryObject(req.body)
         if(patient && newEntry){
-            const entry = patientService.addEntry(patient, req.body);
-            res.status(201).json(entry)
+            const updatedPatient = patientService.addEntry(patient, req.body);
+            res.status(201).json(updatedPatient)
         }
     } catch (err) {
         if (err instanceof Error) {

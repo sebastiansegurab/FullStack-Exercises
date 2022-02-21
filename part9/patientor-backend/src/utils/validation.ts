@@ -74,11 +74,18 @@ export const parseSickLeave = (sickLeave: any): SickLeave => {
 }
 
 export const isHealthCheckRating = (param: any): param is HealthCheckRating => {
-    return Object.values(HealthCheckRating).includes(param)
+    switch (param) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+            return true;
+        default: return false;
+    }
 }
 
 export const parseHealthCheckRating = (healthCheckRating: any): HealthCheckRating => {
-    if (!healthCheckRating || !isString(healthCheckRating) || !isHealthCheckRating(healthCheckRating)) {
+    if (!isHealthCheckRating(healthCheckRating)) {
         throw new Error("Incorrect or missing healthCheckRating " + healthCheckRating)
     }
     return healthCheckRating;

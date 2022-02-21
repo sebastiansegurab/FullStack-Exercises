@@ -31,13 +31,13 @@ const addPatient = (object: NewPatient): Patient => {
     return patient
 };
 
-const addEntry = (patient: Patient, object: NewEntry): Entry => {
+const addEntry = (patient: Patient, object: NewEntry): Patient => {
     const entry: Entry = {
         id: uuidv4(),
         ...object
     }
     patient.entries.push(entry);
-    return entry;
+    return patient;
 };
 
 const toPatientObject = (object: any): NewPatient => {
@@ -57,6 +57,10 @@ const toEntryObject = (object: any): NewEntry => {
     let toNewEntry;
     switch (object.type) {
         case "Hospital":
+            object.discharge = {
+                date: object.dateDischarge,
+                criteria: object.criteria
+            }
             toNewEntry = {
                 ...entry,
                 type: object.type,
