@@ -32,8 +32,8 @@ const PatientListPage: React.FC = () => {
       dispatch(updatePatient(newPatient));
       closeModal();
     } catch (e) {
-      console.error(e.response?.data || 'Unknown Error');
-      setError(e.response?.data?.error || 'Unknown error');
+      console.error(e || 'Unknown Error');
+      setError(e || 'Unknown error');
     }
   };
 

@@ -5,6 +5,7 @@ import { TextField, DiagnosisSelection, EntrySpecificFields, SelectFieldEntryTyp
 import { Entry, EntryType } from "../types";
 import { useStateValue } from "../state";
 import { Button, Grid } from "semantic-ui-react";
+import { isDate, isEntry, isHealthCheckRating, isStringWithoutSpaces } from "../utils/validation";
 
 export type EntryFormValues = Omit<Entry, "id">;
 
@@ -44,14 +45,68 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         if (!values.type) {
           errors.type = requiredError;
         }
+        if (!isEntry(values.type)) {
+          errors.type = "The type is invalid";
+        }
         if (!values.description) {
           errors.description = requiredError;
+        }
+        if (!isStringWithoutSpaces(values.description)) {
+          errors.description = "Description cannot be just white space";
         }
         if (!values.date) {
           errors.date = requiredError;
         }
+        if (!isStringWithoutSpaces(values.date) || !isDate(values.date)) {
+          errors.date = "Invalid format date";
+        }
         if (!values.specialist) {
           errors.specialist = requiredError;
+        }
+        if (!isStringWithoutSpaces(values.specialist)) {
+          errors.specialist = "Specialist cannot be just white space";
+        }
+        switch (values.type) {
+          case "Hospital":
+            if (!values.dateDischarge) {
+              errors.dateDischarge = requiredError;
+            }
+            if (!isStringWithoutSpaces(values.dateDischarge) || !isDate(values.dateDischarge)) {
+              errors.dateDischarge = "Invalid format date";
+            }
+            if (!values.criteria) {
+              errors.criteria = requiredError;
+            }
+            if (!isStringWithoutSpaces(values.criteria)) {
+              errors.criteria = "Criteria cannot be just white space";
+            }
+            break;
+          case "OccupationalHealthcare":
+            if (!values.employerName) {
+              errors.employerName = requiredError;
+            }
+            if (!isStringWithoutSpaces(values.employerName)) {
+              errors.employerName = "Employer cannot be just white space";
+            }
+            if (values.startDate) {
+              if (!isStringWithoutSpaces(values.startDate) || !isDate(values.startDate)) {
+                errors.startDate = "Invalid format date";
+              }
+            }
+            if (values.endDate) {
+              if (!isStringWithoutSpaces(values.endDate) || !isDate(values.endDate)) {
+                errors.endDate = "Invalid format date";
+              }
+            }
+            break;
+          case "HealthCheck":
+            if (!values.healthCheckRating) {
+              errors.healthCheckRating = requiredError;
+            }
+            if (!isHealthCheckRating(values.healthCheckRating)) {
+              errors.healthCheckRating = "The HealthCheckRating is invalid";
+            }
+            break;
         }
         return errors;
       }}
